@@ -16,3 +16,8 @@ int	ft_is_reserved(char c)
 {
 	return (c == '<' || c == '>' || c == '|' || c == '&');
 }
+
+int	ft_is_buildin(char c)
+{
+	return (c == '>');
+}

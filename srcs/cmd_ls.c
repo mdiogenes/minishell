@@ -51,38 +51,3 @@ int	ft_ls(t_ms *mini)
 	closedir(dir);
 	return (SUCCESS);
 }
-
-/*
-implementar con -la
-
-int ft_ls(t_ms *mini)
-{
-	DIR				*dir;
-	struct dirent	*files;
-	int				list;
-	struct stat		data;
-
-	list = 0;
-	dir = opendir(mini->path);
-	while (1)
-	{
-		files = readdir(dir);
-		if (!files)
-			break;
-		if (list == 5)
-		{
-			printf("\n");
-			list = 0;
-		}
-		stat(files->d_name, &data)
-		if (ft_strncmp(files->d_name, ".", 1) != 0)
-		{
-			printf("%-20s", files->d_name);
-			list++;
-		}
-	}
-	printf("\n");
-	closedir(dir);
-	return (1);
-}
-*/

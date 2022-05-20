@@ -12,23 +12,6 @@
 
 #include "minishell.h"
 
-void	ft_clear_nodes(t_ms *mini)
-{
-	t_token	*node;
-
-	if (mini->first_token)
-	{
-		while (mini->first_token)
-		{
-			node = mini->first_token->next;
-			free (mini->first_token->token);
-			mini->first_token->token = NULL;
-			free (mini->first_token);
-			mini->first_token = node;
-		}
-	}
-}
-
 void	ft_free_exit(t_ms *mini)
 {
 	if (mini->line)
@@ -51,17 +34,33 @@ void	ft_get_path_prompt(t_ms *mini)
 	mini->path = ft_strdup(getcwd(pwd, PATH_MAX));
 	if (mini->prompt)
 		free (mini->prompt);
-	tmp = ft_strjoin("[42-ms ", ft_strrchr(getcwd(pwd, PATH_MAX), '/'));
-	mini->prompt = ft_strjoin(tmp, "] ");
+	tmp = ft_strjoin("\e[33m[42-ms ", ft_strrchr(getcwd(pwd, PATH_MAX), '/'));
+	mini->prompt = ft_strjoin(tmp, "]\e[0m ");
 	free (tmp);
 }
 
-int	ft_init_minishell(t_ms *mini)
+
+
+int	ft_init_minishell(t_ms *mini, char **envp)
 {
+	int	i;
+
+	i = 0;
+//copia variables entorno envp a la estructura dupenvp
+	if (!envp || !envp[0])
+		return(0);
+	while (envp[i])
+		i ++;
+	mini->dupenvp= malloc(sizeof(char * )*i);
+	i = 0;
+	while (envp[i])
+	{
+		mini->dupenvp[i] = ft_strdup(envp[i]);
+		i ++;
+	}
+//liberamos al final del programa 
 	mini->status = 1;
-	mini->fd = STDIN_FILENO;
 	mini->first_token = NULL;
-	mini->num_tokens = 0;
 	mini->line = NULL;
 	mini->path = NULL;
 	mini->prompt = NULL;

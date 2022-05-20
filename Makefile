@@ -6,22 +6,35 @@
 #    By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/05 22:26:19 by mporras-          #+#    #+#              #
-#    Updated: 2022/05/11 12:28:23 by msoler-e         ###   ########.fr        #
+#    Updated: 2022/05/16 15:56:04 by msoler-e         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME			=	minishell
 SRC_DIR			=	srcs
-SRCS_FILES		=	cmd_cd.c \
+SRCS_FILES		=	aaa_debug.c \
+					cmd_cd.c \
 					cmd_directory.c \
-					cmd_ls.c \
 					cmd_echo.c \
+					cmd_exit.c \
+					cmd_ls.c \
+					cmd_env.c \
+					exe_forks.c \
+					exe_pipes.c \
+					gnl_gnl.c \
+					gnl_utl.c \
 					main.c \
 					ms_error_handler.c \
 					ms_input.c \
+					ms_process.c \
+					ms_expand.c \
 					ms_signals.c \
 					ms_string_utils.c \
-					ms_struct_utils.c
+					ms_struct_utils.c \
+					ms_workflow.c \
+					rdr_tofile.c \
+					utl_cleaning.c \
+					utl_list.c
 SRCS 			=	$(addprefix $(SRC_DIR)/,$(SRCS_FILES))
 OBJS			=	$(SRCS_FILES:.c=.o)
 LIB_DIR			=	lib
@@ -36,12 +49,12 @@ LIB_READLINE	=	/Users/${USER}/.brew/opt/readline/lib
 #manuel readline
 #INC_READLINE	=	/usr/local/opt/readline/include
 #LIB_READLINE	=	/usr/local/opt/readline/lib
-HEADERe			=	minishell.h
+HEADER			=	minishell.h
 HEADER_DIR		=	inc
 
 all: libs $(NAME)
 
-$(NAME): $(OBJS) $(HEADER_DIR)/$(HEADERe)
+$(NAME): $(OBJS) $(HEADER_DIR)/$(HEADER)
 	$(CC) $(OBJS) $(CFLAGS) -Llib -lft -L$(LIB_READLINE) -lreadline -o $(NAME)
 
 libs: 

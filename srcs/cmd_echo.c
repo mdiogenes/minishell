@@ -6,7 +6,7 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/10 12:48:21 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/05/11 15:35:10 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/05/20 10:58:36 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,25 @@
 //echo devuelve 0 si ha ido todo bien y devuelve> 0 si ocurrio algun error
 int	ft_echo(t_ms *mini)
 {
-	char	*input;
-	char	*opcion;
+	t_token	*token;
 	int		ret;
+	int		opcio;
 
+	opcio = 0;
 	ret = 0;
-	input = ft_substr(mini->line, 5, ft_strlen(mini->line));
-	//buscamos opcion -n
-	opcion = ft_substr(mini->line, 5, 7);
-
-	if (!ft_strncmp(opcion, "-n", 2))
+	token = mini->first_token;
+	if (token->args && (ft_strncmp(token->args->token, "-n", 1) == 0))
 	{
-		input = ft_substr(mini->line, 8, ft_strlen(mini->line));
-		printf("%s",input);
+		opcio = 1;
+		token->args = token->args->next;
 	}
-	else	
-		printf("%s\n",input);
-	free(input);
+	while (token->args)
+	{
+		if (opcio == 0)
+			printf("%s\n", token->args->token);
+		if (opcio == 1)
+			printf("%s", token->args->token);
+		token->args = token->args->next;
+	}
 	return (ret);
 }
