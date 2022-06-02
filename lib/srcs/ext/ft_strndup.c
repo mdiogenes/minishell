@@ -1,32 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_string_utils.c                                  :+:      :+:    :+:   */
+/*   ft_strndup.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/07 23:27:39 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/01 09:16:45 by msoler-e         ###   ########.fr       */
+/*   Created: 2022/05/21 11:40:54 by mporras-          #+#    #+#             */
+/*   Updated: 2022/05/21 11:41:00 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-int	ft_is_reserved(char c)
+char	*ft_strndup(const char *src, size_t len)
 {
-	return (c == '<' || c == '>' || c == '|' || c == '&' || c == '=');
-}
+	char	*dst;
 
-int	ft_is_buildin(char c)
-{
-	return (c == '>');
-}
-
-char	**join_str(char **dst, char **str, int in, int fin)
-{
-	if (!*dst)
-		*dst = ft_substr(*str, in, fin);
-	else
-		*dst = ft_strjoin(*dst, ft_substr(*str, in, fin));
+	dst = (char *)malloc(sizeof(char) * (len + 1));
+	if (dst == NULL)
+		return (NULL);
+	dst[len] = '\0';
+	while (len-- > 0)
+		dst[len] = src[len];
 	return (dst);
 }

@@ -1,32 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_string_utils.c                                  :+:      :+:    :+:   */
+/*   msg_child_signals.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/07 23:27:39 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/01 09:16:45 by msoler-e         ###   ########.fr       */
+/*   Created: 2022/05/26 11:31:02 by mporras-          #+#    #+#             */
+/*   Updated: 2022/05/26 11:31:05 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_is_reserved(char c)
+void	ft_child_signals_msg(int signum)
 {
-	return (c == '<' || c == '>' || c == '|' || c == '&' || c == '=');
-}
-
-int	ft_is_buildin(char c)
-{
-	return (c == '>');
-}
-
-char	**join_str(char **dst, char **str, int in, int fin)
-{
-	if (!*dst)
-		*dst = ft_substr(*str, in, fin);
-	else
-		*dst = ft_strjoin(*dst, ft_substr(*str, in, fin));
-	return (dst);
+	static char		*msg[] = {"", "", "", "", "", "", "",
+		"", "", "", "", "Segmentation fault", "", "", "", "", ""};
+	printf("[ms-42 %s : %d]\n", msg[signum], signum);
 }

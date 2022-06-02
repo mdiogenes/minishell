@@ -6,40 +6,11 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/05 23:23:45 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/10 10:58:14 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/01 11:45:49 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	ft_clear_nodes(t_ms *mini)
-{
-	t_token	*node;
-
-	if (mini->first_token)
-	{
-		while (mini->first_token)
-		{
-			node = mini->first_token->next;
-			free (mini->first_token->token);
-			mini->first_token->token = NULL;
-			free (mini->first_token);
-			mini->first_token = node;
-		}
-	}
-}
-
-void	ft_clear_tabs(char **tab)
-{
-	size_t	i;
-
-	i = -1;
-	if (!tab)
-		return ;
-	while (tab[++i])
-		free (tab[i]);
-	free (tab);
-}
 
 void	ft_free_exit(t_ms *mini)
 {
@@ -68,14 +39,32 @@ void	ft_get_path_prompt(t_ms *mini)
 	free (tmp);
 }
 
-int	ft_init_minishell(t_ms *mini)
+int	ft_init_minishell(t_ms *mini, char **envp)
 {
+	int	i;
+
+	i = 0;
+//copia variables entorno envp a la estructura dupenvp
+	if (!envp || !envp[0])
+		return(0);
+	while (envp[i])
+		i ++;
+	mini->dupenvp= malloc(sizeof(char * )*i);
+	if (mini->dupenvp == NULL)
+		ft_error_free(errno, mini);
+	i = 0;
+	while (envp[i])
+	{
+		mini->dupenvp[i] = ft_strdup(envp[i]);
+		i ++;
+	}
+//liberamos al final del programa 
 	mini->status = 1;
 	mini->first_token = NULL;
-	mini->num_tokens = 0;
 	mini->line = NULL;
 	mini->path = NULL;
 	mini->prompt = NULL;
+	mini->env = NULL;
 	ft_get_path_prompt(mini);
 	return (1);
 }

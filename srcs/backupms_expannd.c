@@ -6,30 +6,27 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 12:51:51 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/06/01 14:27:57 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/01 12:40:56 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_change_var(char **dst, int *i_j, char **str, t_ms *mini)
+int	ft_change_var(char **dst, int *i_j, int i, int j, char **str, t_ms *mini)
 {
 	t_token	*node;
 	char	*var;
-	int		*i;
-	int		*j;
 
-	i = &i_j[0];
-	j = &i_j[1];
+	i_j[1] = 5;
+	printf("\ni_j%d\n",i_j[0]);
 	node = NULL;
 	var = NULL;
-	dst = join_str(dst, str, *j, *i - *j);
-	*i = *i + 1;
-	*j = *i;
-	while ((*str)[*i] != ' ' && (*i < (int)ft_strlen(*str))
-		&& (*str)[*i] != '$')
-		*i = *i + 1;
-	node = ft_find_envar_export(ft_substr((*str), *j, *i - *j), mini);
+	dst = join_str(dst, str, j, i - j);
+	i ++;
+	j = i;
+	while ((*str)[i] != ' ' && (i < (int)ft_strlen(*str)) && (*str)[i] != '$')
+		i++;
+	node = ft_find_envar_export(ft_substr((*str), j, i -j), mini);
 	if (!node)
 		var = NULL;
 	else if (node->args->token)
@@ -38,7 +35,7 @@ void	ft_change_var(char **dst, int *i_j, char **str, t_ms *mini)
 		*dst = ft_strjoin(*dst, var);
 	else
 		*dst = ft_strjoin(*dst, "\0");
-	*j = *i;
+	return (i);
 }
 
 void	ft_caseinterr(char *str, char **dst, int *ptri, int *ptrj)
@@ -98,26 +95,37 @@ void	rarecase(char *str, char **dst, int *ptri, int *ptrj)
 int	ft_expand_node(t_ms *mini, t_token *node)
 {
 	char	*dst;
-	int		i_j[2];
+	char	*str;
+	int		len;
+	int		i;
+	int		j;
+	int		*i_j;
 
-	i_j[0] = 0;
-	i_j[1] = 0;
+	i_j = (int *)malloc(sizeof (int)*2);	
+	str = node->token;
+	len = ft_strlen(str);
+	i_j[0]=1;
+	i_j[1]=2;
+
+	i = 0;
+	j = 0;
 	dst = NULL;
-	while (i_j[0] < (int)ft_strlen(node->token))
+	while (i < len)
 	{
-		if ((node->token[i_j[0]] == '$') && (node->token[i_j[0] +1] != '?')
-			&& (i_j[0] + 1 < (int)ft_strlen(node->token))
-			&& (node->token[i_j[0] + 1] != '$')
-			&& (node->token[i_j[0] + 1] != ' '))
-			ft_change_var(&dst, &i_j[0], &node->token, mini);
-		rarecase(node->token, &dst, &i_j[0], &i_j[1]);
-		if (node->token[i_j[0]] != '$' || !node->token[i_j[0] + 1])
-			i_j[0]++;
+		if ((str[i] == '$') && (i + 1 < len) && (str[i + 1] != '$')
+			&& (str[i + 1] != ' ') && (str[i +1] != '?'))
+		{
+			i = ft_change_var(&dst, i_j, i, j, &str, mini);
+			j = i;
+		}
+		rarecase(str, &dst, &i, &j);
+		if (str[i] != '$' || !str[i + 1])
+			i++;
 	}	
-	if (i_j[0] > i_j[1])
-		dst = *join_str(&dst, &node->token, i_j[1], i_j[0] - i_j[1]);
-	if (node->token)
-		free(node->token);
+	if (i > j)
+		dst = *join_str(&dst, &str, j, i - j);
+	if (str)
+		free(str);
 	node->token = dst;
 	return (SUCCESS);
 }

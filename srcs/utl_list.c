@@ -6,49 +6,11 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 13:30:44 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/11 13:30:47 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/01 11:44:19 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int ft_process_brach(t_ms *mini)
-{
-	size_t	size;
-
-	size = ft_count_args(mini);
-	if (size == 0)
-		return (SUCCESS);
-	while(size--)
-		ft_process_node(mini);
-	return (SUCCESS);
-}
-
-int ft_delete_node(t_token *node)
-{
-	if (!node)
-		return (ERROR);
-	if (node->token)
-		free (node->token);
-	node->next = NULL;
-	node->args = NULL;
-	free (node);
-	return (SUCCESS);
-}
-
-int ft_process_node(t_ms *mini)
-{
-	t_token	*node;
-
-	if (!mini->first_token)
-		return (SUCCESS);
-	node = mini->first_token;
-	mini->first_token = node->next;
-	free (node->token);
-	node->next = NULL;
-	free (node);
-	return (SUCCESS);
-}
 
 size_t	ft_count_node(t_ms *mini)
 {
@@ -97,5 +59,11 @@ t_token	*ft_inp_new(char *cmd, t_ms *mini)
 	rst->out = TKN_STDOUT;
 	rst->next = NULL;
 	rst->args = NULL;
+	if (rst->type == CMD_LITERAL || rst->type == CMD_EXPAND)
+	{
+		rst->token = ft_strtrim(cmd, "\"\'");
+		if (cmd)
+			free (cmd);
+	}
 	return (rst);
 }

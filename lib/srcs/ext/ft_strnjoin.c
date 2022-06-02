@@ -1,32 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_string_utils.c                                  :+:      :+:    :+:   */
+/*   ft_strnjoin.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/07 23:27:39 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/01 09:16:45 by msoler-e         ###   ########.fr       */
+/*   Created: 2022/05/31 00:18:04 by mporras-          #+#    #+#             */
+/*   Updated: 2022/05/31 00:18:06 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-int	ft_is_reserved(char c)
+char	*ft_strnjoin(char const *s1, char const *s2,
+			size_t len_s1, size_t len_s2)
 {
-	return (c == '<' || c == '>' || c == '|' || c == '&' || c == '=');
-}
+	char	*rst;
 
-int	ft_is_buildin(char c)
-{
-	return (c == '>');
-}
-
-char	**join_str(char **dst, char **str, int in, int fin)
-{
-	if (!*dst)
-		*dst = ft_substr(*str, in, fin);
-	else
-		*dst = ft_strjoin(*dst, ft_substr(*str, in, fin));
-	return (dst);
+	if (!s1 || !s2)
+		return (NULL);
+	rst = (char *)malloc(sizeof(char) * (len_s1 + len_s2 + 1));
+	if (rst == NULL)
+		return (NULL);
+	ft_memcpy(rst, s1, len_s1);
+	ft_memcpy(&rst[len_s1], s2, len_s2);
+	rst[len_s1 + len_s2] = 0;
+	return (rst);
 }

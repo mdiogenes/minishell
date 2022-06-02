@@ -12,7 +12,3 @@
 
 #include "minishell.h"
 
-int ft_bin_redir(t_ms *mini)
-{
-	
-}

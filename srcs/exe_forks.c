@@ -12,14 +12,16 @@
 
 #include "minishell.h"
 
-size_t	ft_count_args(t_ms *mini)
+size_t	ft_count_args(t_token *token)
 {
 	size_t	i;
 	t_token	*node;
 
-	i = 0;
-	node = mini->first_token;
-	while (node && (node->type <= CMD_ENV_VAR || (i == 0 && node->type == CMD_EXE)))
+	i = 1;
+	if (token->args == NULL)
+		return (1);
+	node = token->args;
+	while (node)
 	{
 		i++;
 		node = node->next;
@@ -27,55 +29,62 @@ size_t	ft_count_args(t_ms *mini)
 	return (i);
 }
 
-char **ft_build_argv(t_ms *mini)
+char	**ft_build_argv(t_ms *mini, t_token *token)
 {
 	size_t	size;
 	size_t	i;
 	t_token	*node;
 	char	**rst;
 
-	size = ft_count_args(mini);
-	i = -1;
+	size = ft_count_args(mini->first_token);
+	i = 1;
 	rst = (char **)malloc(sizeof(char *) * (size + 1));
 	if (rst == NULL)
 		ft_error_free(errno, mini);
 	rst[size] = NULL;
-	node = mini->first_token;
-	while (++i < size)
+	rst[0] = token->token;
+	node = token->args;
+	while (node)
 	{
-		rst[i] = ft_strdup(node->token);
-		if (rst[i] == NULL)
-			ft_error_free(errno, mini);
+		rst[i] = node->token;
 		node = node->next;
+		i++;
 	}
 	return (rst);
 }
 
-int ft_loader_exe(t_ms *mini, char *argv[], char *argenv[])
+int	ft_loader_exe(t_ms *mini, char *argv[], char *argenv[])
 {
 	if (execve(mini->first_token->token, argv, argenv) == -1)
-			ft_error_handler(errno);
+		ft_error_handler(errno, mini);
 	exit (ERROR);
 }
 
-int ft_fork_and_run(t_ms *mini)
+int	ft_fork_and_run(t_ms *mini)
 {
 	pid_t	fork_pid;
 	char	**argv;
 	char	**argenv;
 	int		rst;
+	int		sig;
 
-	argv = ft_build_argv(mini);
-	argenv = ft_build_argv(mini);
+	argv = ft_build_argv(mini, mini->first_token);
+	argenv = ft_build_argv(mini, mini->first_token);
 	fork_pid = fork();
 	if (fork_pid > 0)
 	{
-		waitpid(fork_pid, &rst, WUNTRACED);
-		ft_clear_tabs(argv);
-		ft_clear_tabs(argenv);
+		waitpid(fork_pid, &rst, 0);
+		if (WIFSIGNALED(rst) != 0)
+		{
+			sig = WTERMSIG(rst);
+			ft_child_signals_msg(sig);
+		}
+		free(argv);
+		free(argenv);
+		ft_process_branch(mini);
 		return (WEXITSTATUS(rst));
 	}
 	if (fork_pid == 0)
-		ft_loader_exe(mini, argv, argenv);
-	return (SUCCESS);	
+		ft_loader_exe(mini, argv, argv);
+	return (SUCCESS);
 }
