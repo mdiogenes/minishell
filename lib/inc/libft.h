@@ -21,6 +21,26 @@ typedef struct s_list
 	struct s_list	*next;
 }	t_list;
 
+# define BUFFER_SIZE 1024
+
+//Extended
+char	*ft_strndup(const char *src, size_t len);
+size_t	ft_strlenchar(const char *s, char c);
+size_t	ft_strnstr_len(const char *haystack, const char *needle, size_t len);
+char	*ft_strnjoin(char const *s1, char const *s2,
+			size_t len_s1, size_t len_s2);
+char	*get_next_line(int fd);
+//gnl
+int		ft_strlen_gnl(char *s);
+char	*ft_substr_gnl(char *s, int start, int len, int *nl_len);
+char	*ft_strdup_gnl(char *src, int len);
+char	*ft_strjoin_gnl(char *s1, char *s2, int bytes, int *nl_len);
+void	*ft_memcpy_gnl(char *dest, char *src, int n);
+char	*ft_line_proccess(char **buffer, int bytes, int *nl_len);
+char	*ft_buffer_reader(int fd, char **buffer, char *reader, int *nl_len);
+char	*ft_delete_line_from_buffer(char **buffer, int *nl_len);
+int		ft_get_endline(char *str);
+//
 int		ft_atoi(const char *str);
 void	ft_bzero(void *s, size_t n);
 void	*ft_calloc(size_t count, size_t size);
@@ -64,5 +84,3 @@ void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-
-#endif

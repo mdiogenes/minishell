@@ -6,7 +6,7 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/10 12:48:21 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/05/20 10:58:36 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/05/31 12:41:37 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,7 @@ int	ft_echo(t_ms *mini)
 			printf("%s", token->args->token);
 		token->args = token->args->next;
 	}
+	ft_export_var("?", "0", SYS_HIDDEN, mini);
+	ft_process_branch(mini);
 	return (ret);
 }

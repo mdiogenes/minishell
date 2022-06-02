@@ -36,5 +36,6 @@ int	ft_env(t_ms *mini)
 			printf("\n");
 		}
 	}
+	ft_process_branch(mini);
 	return (1);
 }

@@ -1,27 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cmd_cd.c                                           :+:      :+:    :+:   */
+/*   msg_child_signals.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/09 22:25:12 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/10 13:01:48 by msoler-e         ###   ########.fr       */
+/*   Created: 2022/05/26 11:31:02 by mporras-          #+#    #+#             */
+/*   Updated: 2022/05/26 11:31:05 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_cd(t_ms *mini)
+void	ft_child_signals_msg(int signum)
 {
-	int		move_dir;
-	char	*input;
-
-	input = ft_substr(mini->line, 3, ft_strlen(mini->line));
-	move_dir = chdir(input);
-	free (input);
-	if (move_dir != 0)
-		return (ft_error_handler(errno));
-	ft_get_path_prompt(mini);
-	return (SUCCESS);
+	static char		*msg[] = {"", "", "", "", "", "", "",
+		"", "", "", "", "Segmentation fault", "", "", "", "", ""};
+	printf("[ms-42 %s : %d]\n", msg[signum], signum);
 }

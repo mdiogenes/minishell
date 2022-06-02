@@ -1,12 +1,12 @@
-//* ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cmd_directory.c                                    :+:      :+:    :+:   */
+/*   inp_directory.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/10 22:09:14 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/10 22:09:19 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/01 14:15:29 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,9 @@
 int	ft_read_from_node(char *token)
 {
 	static char		*command[] = {"'", "\"", "$", "pwd", "cd", "ls", "echo",
-		"export", "unset", "env", "exit", "./", "|", ">", ">>"};
-	static size_t	sizes[TOKEN_ENUM] = {1, 1, 1, 3, 2, 2, 4, 6, 5, 3, 4, 2, 1, 1, 2};
+		"export", "unset", "env", "exit", "./", "=", " =", "= ", " = ", "|", ">", ">>", "<", "<<"};
+	static size_t	sizes[TOKEN_ENUM] = {1, 1, 1, 3, 2, 2, 4,
+		6, 5, 3, 4, 2, 1, 2, 2, 3, 1, 1, 2, 1, 2};
 	int				i;
 	size_t			len;
 
@@ -37,7 +38,7 @@ int	ft_read_from_node(char *token)
 			return (CMD_ENV_VAR);
 		i++;
 	}
-	return (0);
+	return (NO_TYPE);
 }
 
 int	ft_get_meta_type(int type)
@@ -48,7 +49,9 @@ int	ft_get_meta_type(int type)
 		return (MTA_BUILDIN);
 	if (type > CMD_EXIT && type <= CMD_EXE)
 		return (MTA_OUTEXE);
-	if (type > CMD_EXE)
+	if (type >= CMD_ASSIGN && type <= CMD_ASSIGN_BE)
+		return (MTA_ASSIGN);
+	if (type >= RDR_PIPE)
 		return (MTA_REDIR);
 	return (MTA_NOTYPE);
 }

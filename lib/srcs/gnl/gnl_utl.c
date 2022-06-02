@@ -6,11 +6,11 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/29 23:54:08 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/16 13:18:46 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/01 11:44:56 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
 int	ft_strlen_gnl(char *s)
 {

@@ -6,39 +6,31 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 12:51:51 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/06/01 14:27:57 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/01 10:45:11 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_change_var(char **dst, int *i_j, char **str, t_ms *mini)
+int	ft_change_var(char **dst, int i, int j, char **str)
 {
-	t_token	*node;
 	char	*var;
-	int		*i;
-	int		*j;
+	char	*proba;
 
-	i = &i_j[0];
-	j = &i_j[1];
-	node = NULL;
 	var = NULL;
-	dst = join_str(dst, str, *j, *i - *j);
-	*i = *i + 1;
-	*j = *i;
-	while ((*str)[*i] != ' ' && (*i < (int)ft_strlen(*str))
-		&& (*str)[*i] != '$')
-		*i = *i + 1;
-	node = ft_find_envar_export(ft_substr((*str), *j, *i - *j), mini);
-	if (!node)
-		var = NULL;
-	else if (node->args->token)
-		var = node->args->token;
+	dst = join_str(dst, str, j, i - j);
+	i ++;
+	j = i;
+	while ((*str)[i] != ' ' && (i < (int)ft_strlen(*str)) && (*str)[i] != '$')
+	i++;
+	proba = ft_substr(*str, j, i - j);
+	var = getenv((const char *)proba);
+	free (proba);
 	if (var)
 		*dst = ft_strjoin(*dst, var);
 	else
 		*dst = ft_strjoin(*dst, "\0");
-	*j = *i;
+	return (i);
 }
 
 void	ft_caseinterr(char *str, char **dst, int *ptri, int *ptrj)
@@ -95,46 +87,57 @@ void	rarecase(char *str, char **dst, int *ptri, int *ptrj)
 	*ptrj = j;
 }
 
-int	ft_expand_node(t_ms *mini, t_token *node)
+char	*ft_expand(char *str, int len)
 {
 	char	*dst;
-	int		i_j[2];
+	int		i;
+	int		j;
 
-	i_j[0] = 0;
-	i_j[1] = 0;
+	i = 0;
+	j = 0;
 	dst = NULL;
-	while (i_j[0] < (int)ft_strlen(node->token))
+	while (i < len)
 	{
-		if ((node->token[i_j[0]] == '$') && (node->token[i_j[0] +1] != '?')
-			&& (i_j[0] + 1 < (int)ft_strlen(node->token))
-			&& (node->token[i_j[0] + 1] != '$')
-			&& (node->token[i_j[0] + 1] != ' '))
-			ft_change_var(&dst, &i_j[0], &node->token, mini);
-		rarecase(node->token, &dst, &i_j[0], &i_j[1]);
-		if (node->token[i_j[0]] != '$' || !node->token[i_j[0] + 1])
-			i_j[0]++;
+		if ((str[i] == '$') && (i + 1 < len) && (str[i + 1] != '$')
+			&& (str[i + 1] != ' ') && (str[i +1] != '?'))
+		{
+			i = ft_change_var(&dst, i, j, &str);
+			j = i;
+		}
+		rarecase(str, &dst, &i, &j);
+		if (str[i] != '$' || !str[i + 1])
+			i++;
 	}	
-	if (i_j[0] > i_j[1])
-		dst = *join_str(&dst, &node->token, i_j[1], i_j[0] - i_j[1]);
-	if (node->token)
-		free(node->token);
-	node->token = dst;
-	return (SUCCESS);
+	if (i > j)
+		dst = *join_str(&dst, &str, j, i - j);
+	if (str)
+		free(str);
+	return (dst);
 }
 
-int	ft_get_expand(t_ms *mini, t_token *node)
+void	ft_get_expand(t_ms	*mini)
 {
-	if (!node)
-		return (SUCCESS);
-	if (!node->args && !node->next)
-		return (ft_expand_node(mini, node));
-	if (node->args && node->next)
-		return (ft_get_expand(mini, node->args)
-			+ ft_get_expand(mini, node->next)
-			+ ft_expand_node(mini, node));
-	if (!node->args && node->next)
-		return (ft_get_expand(mini, node->next)
-			+ ft_expand_node(mini, node));
-	return (ft_get_expand(mini, node->args)
-		+ ft_expand_node(mini, node));
+	t_token	*token;
+	t_token	*args;
+	int		len;
+
+	token = mini->first_token;
+	args = mini->first_token->args;
+	len = 0;
+	while (token)
+	{
+		while (args)
+		{	
+			if (args->type == CMD_EXPAND || args->type == NO_TYPE
+				|| args->type == CMD_ENV_VAR)
+			{
+				len = ft_strlen(args->token);
+				args->token = ft_expand(args->token, len);
+			}
+			if (token->type == CMD_EXPORT)
+				printf("proba export");
+			args = args->next;
+		}
+		token = token->next;
+	}
 }

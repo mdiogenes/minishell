@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 13:30:44 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/11 13:30:47 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/01 11:44:19 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,13 +59,11 @@ t_token	*ft_inp_new(char *cmd, t_ms *mini)
 	rst->out = TKN_STDOUT;
 	rst->next = NULL;
 	rst->args = NULL;
-	/*
 	if (rst->type == CMD_LITERAL || rst->type == CMD_EXPAND)
 	{
 		rst->token = ft_strtrim(cmd, "\"\'");
 		if (cmd)
 			free (cmd);
 	}
-	*/
 	return (rst);
 }

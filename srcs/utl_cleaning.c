@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/15 00:15:17 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/20 09:14:48 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/01 11:46:15 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@ void	ft_clear_tabs(char **tab)
 	i = -1;
 	if (!tab)
 		return ;
-	//while (tab[++i])
-	//	free (tab[i]);
 	free (tab);
 }
 
@@ -36,19 +34,21 @@ int	ft_delete_node(t_token *node)
 	return (SUCCESS);
 }
 
-int	ft_delete_args(t_token *args)
+int	ft_delete_args(t_token *node)
 {
-	t_token	*tmp;
-
-	if (!args)
+	if (!node)
 		return (SUCCESS);
-	while (args)
-	{
-		tmp = args->next;
-		ft_delete_node(args);
-		args = tmp;
-	}
-	return (SUCCESS);
+	if (!node->args && !node->next)
+		return (ft_delete_node(node));
+	if (node->args && node->next)
+		return (ft_delete_args(node->args)
+			+ ft_delete_args(node->next)
+			+ ft_delete_node(node));
+	if (!node->args && node->next)
+		return (ft_delete_args(node->next)
+			+ ft_delete_node(node));
+	return (ft_delete_args(node->args)
+		+ ft_delete_node(node));
 }
 
 int	ft_process_branch(t_ms *mini)

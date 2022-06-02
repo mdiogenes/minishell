@@ -1,32 +1,25 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ms_string_utils.c                                  :+:      :+:    :+:   */
+/*   ft_strlenchar.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/07 23:27:39 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/01 09:16:45 by msoler-e         ###   ########.fr       */
+/*   Created: 2022/05/21 11:44:45 by mporras-          #+#    #+#             */
+/*   Updated: 2022/05/21 11:47:14 by mporras-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "libft.h"
 
-int	ft_is_reserved(char c)
+size_t	ft_strlenchar(const char *s, char c)
 {
-	return (c == '<' || c == '>' || c == '|' || c == '&' || c == '=');
-}
+	size_t	i;
 
-int	ft_is_buildin(char c)
-{
-	return (c == '>');
-}
-
-char	**join_str(char **dst, char **str, int in, int fin)
-{
-	if (!*dst)
-		*dst = ft_substr(*str, in, fin);
-	else
-		*dst = ft_strjoin(*dst, ft_substr(*str, in, fin));
-	return (dst);
+	i = 0;
+	if (!s)
+		return (0);
+	while (s[i] && s[i] != c)
+		i++;
+	return (i);
 }

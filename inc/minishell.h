@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/05 22:36:51 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/20 10:58:44 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/01 14:21:16 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,24 +30,30 @@
 # include <errno.h>
 # include <string.h>
 
-# define BUFFER_SIZE 100
 # define SUCCESS  1
 # define ERROR 0
 # define MSG_MANY_ARG "too many arguments"
-# define TOKEN_ENUM 15
+# define MSG_SYNTAX "syntax error near unexpected token "
+# define MSG_ERR_IDNT "not a valid identifier"
+# define MSG_ERR_CMD "command not found"
+# define TKN_NL "`newline'"
+# define TKN_PIPE "`|'"
+# define TOKEN_ENUM 22
 # define PIPE_WRITE 1
 # define PIPE_READ 0
 # define TKN_STDIN 0
 # define TKN_PIPEIN 1
 # define TKN_STDOUT 0
 # define TKN_PIPEOUT 1
+# define SYS_VAR 1
+# define SYS_HIDDEN 2
 
 typedef enum e_cmd
 {
 	NO_TYPE,
-	CMD_LITERAL,
 	CMD_EXPAND,
 	CMD_ENV_VAR,
+	CMD_LITERAL,
 	CMD_PWD,
 	CMD_CD,
 	CMD_LS,
@@ -56,15 +62,23 @@ typedef enum e_cmd
 	CMD_UNSET,
 	CMD_ENV,
 	CMD_EXIT,
-	CMD_EXE, 
+	CMD_EXE,
+	CMD_ASSIGN,
+	CMD_ASSIGN_LE,
+	CMD_ASSIGN_RE,
+	CMD_ASSIGN_BE,
 	RDR_PIPE,
 	RDR_TO_FILE,
-	RDR_APP_FILE
+	RDR_APP_FILE,
+	IMP_FROM_FILE,
+	IMP_HEREDOC
 }	t_cmd;
 
 typedef enum e_meta
 {
 	MTA_NOTYPE,
+	MTA_ASSIGN,
+	MTA_TO_EXPORT,
 	MTA_ARGS,
 	MTA_BUILDIN,
 	MTA_OUTEXE,
@@ -91,7 +105,29 @@ typedef struct s_ms
 	char			*path;
 	char			**dupenvp;
 	struct s_token	*first_token;
+	struct s_token	*env;
 }	t_ms;
+
+void	ft_export_var(char *var, char *val, int type, t_ms *mini);
+void	ft_export_cmd(t_ms *mini);
+
+void	ft_env_sort(t_token **first_env, t_token *new);
+int		ft_expand_envar(t_token *node, t_ms *mini);
+int 	ft_env_to_list(char **env, t_ms *mini);
+int 	ft_print_vars(t_ms *mini);
+
+//err msg
+void	ft_child_signals_msg(int signum);
+//redir
+int		ft_heredoc(t_ms *mini);
+int 	ft_dup_file(t_ms *mini);
+int 	ft_inp_from_file(t_ms *mini);
+
+//input preprocess
+int		ft_check_input_export(t_ms *mini);
+
+void	ft_input_preprocess(t_ms *mini);
+void	ft_workflow_check(t_ms *mini);
 
 //process
 int	ft_build_in(t_ms *mini);
@@ -135,42 +171,31 @@ int		ft_fork_and_run(t_ms *mini);
 
 //input
 int		ft_load_input(t_ms *mini);
-void	ft_get_expand(t_ms *mini);
+int		ft_get_expand(t_ms *mini, t_token *node);
 
-//directory?
+//directory
 int		ft_read_from_node(char *token);
 int		ft_get_meta_type(int type);
 
 // errors
+int		ft_error_export(t_token *token);
 int		ft_error_comands(char *cmd, char *msg);
-int		ft_error_handler(int error);
+int		ft_error_handler(int error, t_ms *mini);
 int		ft_error_free(int error, t_ms *mini);
 
 // strings
 int		ft_is_reserved(char c);
-int	ft_is_buildin(char c);
+int		ft_is_buildin(char c);
+char	**join_str(char **dst, char **str, int in, int fin);
 
 // list utils
 size_t	ft_count_node(t_ms *mini);
 void	ft_inp_append(t_token **lst, t_token *new);
 t_token	*ft_inp_new(char *cmd, t_ms *mini);
+t_token	*ft_find_envar_export(char *needle, t_ms *mini);
 
 //void	rl_replace_line (const char *text, int clear_undo);
 int		set_signal(t_ms *mini);
 void	signal_ctrld();
 
-//redir
-int ft_dup_file(char *argv[]);
-
-//getnextline
-char	*get_next_line(int fd);
-int		ft_strlen_gnl(char *s);
-char	*ft_substr_gnl(char *s, int start, int len, int *nl_len);
-char	*ft_strdup_gnl(char *src, int len);
-char	*ft_strjoin_gnl(char *s1, char *s2, int bytes, int *nl_len);
-void	*ft_memcpy_gnl(char *dest, char *src, int n);
-char	*ft_line_proccess(char **buffer, int bytes, int *nl_len);
-char	*ft_buffer_reader(int fd, char **buffer, char *reader, int *nl_len);
-char	*ft_delete_line_from_buffer(char **buffer, int *nl_len);
-int		ft_get_endline(char *str);
 # endif

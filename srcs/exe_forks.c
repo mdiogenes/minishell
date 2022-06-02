@@ -56,7 +56,7 @@ char	**ft_build_argv(t_ms *mini, t_token *token)
 int	ft_loader_exe(t_ms *mini, char *argv[], char *argenv[])
 {
 	if (execve(mini->first_token->token, argv, argenv) == -1)
-		ft_error_handler(errno);
+		ft_error_handler(errno, mini);
 	exit (ERROR);
 }
 
@@ -66,15 +66,21 @@ int	ft_fork_and_run(t_ms *mini)
 	char	**argv;
 	char	**argenv;
 	int		rst;
+	int		sig;
 
 	argv = ft_build_argv(mini, mini->first_token);
 	argenv = ft_build_argv(mini, mini->first_token);
 	fork_pid = fork();
 	if (fork_pid > 0)
 	{
-		waitpid(fork_pid, &rst, WUNTRACED);
-		ft_clear_tabs(argv);
-		ft_clear_tabs(argenv);
+		waitpid(fork_pid, &rst, 0);
+		if (WIFSIGNALED(rst) != 0)
+		{
+			sig = WTERMSIG(rst);
+			ft_child_signals_msg(sig);
+		}
+		free(argv);
+		free(argenv);
 		ft_process_branch(mini);
 		return (WEXITSTATUS(rst));
 	}

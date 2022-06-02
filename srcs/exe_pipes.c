@@ -12,11 +12,6 @@
 
 #include "minishell.h"
 
-void	ft_process_at_fork(char *argv[])
-{
-		ft_dup_file(argv);
-}
-
 void	ft_pipe_exec(t_ms *mini, char **argv, int n)
 {
 	if (mini->first_token->out == TKN_PIPEOUT)
@@ -31,10 +26,16 @@ void	ft_pipe_exec(t_ms *mini, char **argv, int n)
 		close(mini->pipes[n - 1][PIPE_READ]);
 		close(mini->pipes[n - 1][PIPE_WRITE]);
 	}
-	if (mini->first_token->meta == RDR_TO_FILE)
-		ft_process_at_fork(argv);
-	printf ("%s\n ", argv[1]);
+	if (mini->first_token->type == RDR_TO_FILE
+		|| mini->first_token->type == RDR_APP_FILE)
+		ft_dup_file(mini);
+	else if (mini->first_token->type == IMP_FROM_FILE)
+		ft_inp_from_file(mini);
+	else if (mini->first_token->type == IMP_HEREDOC)
+		ft_heredoc(mini);
 	execve(argv[0], argv, NULL);
+	ft_error_handler(errno, mini);
+	exit (ERROR);
 }
 
 int	**ft_build_pipes(int n, t_ms *mini)
@@ -69,11 +70,22 @@ int	ft_count_pipes(t_ms *mini)
 int	ft_control_pipeline(t_ms *mini, int n)
 {
 	int	status;
+	int sig;
 
 	close(mini->pipes[n - 1][PIPE_READ]);
 	close(mini->pipes[n - 1][PIPE_WRITE]);
 	waitpid(-1, &status, 0);
+		if (WIFSIGNALED(status) != 0)
+		{
+			sig = WTERMSIG(status);
+			ft_child_signals_msg(sig);
+		}
 	waitpid(-1, &status, 0);
+	if (WIFSIGNALED(status) != 0)
+		{
+			sig = WTERMSIG(status);
+			ft_child_signals_msg(sig);
+		}
 	return (SUCCESS);
 }
 
@@ -97,7 +109,7 @@ int	ft_pipes(t_ms *mini)
 			ft_pipe_exec(mini, argv, n);
 		if (token->in == TKN_PIPEIN)
 			ft_control_pipeline(mini, n);
-		ft_clear_tabs(argv);
+		free(argv);
 		ft_process_branch(mini);
 		token = mini->first_token;
 		n++;

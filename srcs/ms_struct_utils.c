@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/05 23:23:45 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/10 10:58:14 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/01 11:45:49 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,6 @@ void	ft_get_path_prompt(t_ms *mini)
 	free (tmp);
 }
 
-
-
 int	ft_init_minishell(t_ms *mini, char **envp)
 {
 	int	i;
@@ -52,6 +50,8 @@ int	ft_init_minishell(t_ms *mini, char **envp)
 	while (envp[i])
 		i ++;
 	mini->dupenvp= malloc(sizeof(char * )*i);
+	if (mini->dupenvp == NULL)
+		ft_error_free(errno, mini);
 	i = 0;
 	while (envp[i])
 	{
@@ -64,6 +64,7 @@ int	ft_init_minishell(t_ms *mini, char **envp)
 	mini->line = NULL;
 	mini->path = NULL;
 	mini->prompt = NULL;
+	mini->env = NULL;
 	ft_get_path_prompt(mini);
 	return (1);
 }
