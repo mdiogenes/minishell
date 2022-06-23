@@ -6,19 +6,84 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 13:28:40 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/11 13:28:44 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/23 11:30:24 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	all_isdigit(t_token *token)
+{
+	int	n;
+
+	n = ft_strlen(token->token) - 1;
+	while (n > 0 && ft_isdigit(token->token[n]))
+		n--;
+	return (ft_isdigit(token->token[n]));
+}
+
+int	check_args(t_token *token, int size, t_ms *mini)
+{
+	int	temp;
+
+	temp = 0;
+	while (token)
+	{
+		if (all_isdigit(token) || token->token[0] == '-')
+		{	
+			temp = 1;
+			if (ft_send_to_atoi(token->token) == 1)
+				mini->exitstatus = ft_atoi(token->token);
+			else
+				exit(ft_error_comands(ERR_EXIT,
+						mini->first_token->token, MSG_NUM_ARG, mini));
+		}
+		else if (temp == 0)
+		{
+			printf("exit\n");
+			exit(ft_error_comands(ERR_EXIT,
+					mini->first_token->token, MSG_NUM_ARG, mini));
+		}
+		token = token->next;
+		size ++;
+	}
+	return (size);
+}
+
+int	normalize_number_exit(t_ms *mini)
+{
+	int	n;
+
+	n = 0;
+	if (mini->exitstatus >= 256)
+		n = (mini->exitstatus - ((mini->exitstatus / 256) * 256));
+	if (mini->exitstatus < 0)
+		n = (256 - (((mini->exitstatus / 256) * 256) - mini->exitstatus));
+	return (n);
+}
+
 int	ft_exit(t_ms *mini)
 {
+	t_token	*token;
 	size_t	size;
 
-	size = ft_count_node(mini);
-	if (size != 1)
-		return (ft_error_comands(mini->first_token->token, MSG_MANY_ARG));
-	ft_free_exit(mini);
-	exit (0);
+	size = 0;
+	token = mini->first_token->args;
+	size = check_args(token, size, mini);
+	if (size == 0)
+	{
+		mini->exitstatus = 0;
+		ft_free_exit(mini);
+		exit(mini->exitstatus);
+	}
+	if (size == 1)
+	{
+		mini->exitstatus = normalize_number_exit(mini);
+		ft_free_exit(mini);
+		exit(mini->exitstatus);
+	}
+	if (size > 1)
+		mini->exitstatus = ft_error_comands(ERR_EXIT, mini->first_token->token,
+				MSG_MANY_ARG, mini);
+	return (mini->exitstatus);
 }

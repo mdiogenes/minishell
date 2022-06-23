@@ -23,3 +23,18 @@ size_t	ft_strlenchar(const char *s, char c)
 		i++;
 	return (i);
 }
+
+int	ft_strict_lenchar(const char *s, char c)
+{
+	int	i;
+
+	i = -1;
+	if (!s)
+		return (-1);
+	while (s[++i])
+	{
+		if (s[i] == c)
+			return (i);
+	}
+	return (-1);
+}

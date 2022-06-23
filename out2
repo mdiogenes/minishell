@@ -1,0 +1,85 @@
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+
+ ==== Despues de expand y wildcard ====
+
+                               -> >> [0x7ff5f6504360 node] [0x7ff5f6504350 token] (1 in - 0 out)[18 t - 8 m (len 2)]
+                                         L-> out2 [0x7ff5f65043a0 node] [0x7ff5f6504390 token] (0 in - 0 out)[0 t - 5 m (len 4)]
+                     -> > [0x7ff5f65042e0 node] [0x7ff5f65042d0 token] (1 in - 1 out)[17 t - 8 m (len 1)]
+                               L-> out1 [0x7ff5f6504320 node] [0x7ff5f6504310 token] (0 in - 0 out)[0 t - 5 m (len 4)]
+           =>> echo [0x7ff5f6504270 node] [0x7ff5f6504180 token] (0 in - 1 out)[6 t - 6 m (len 4)]
+                     L-> 2 [0x7ff5f65042a0 node] [0x7ff5f65041f0 token] (0 in - 0 out)[0 t - 5 m (len 1)]
+ ==== END Despues de expand y wildcard ====
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2
+2

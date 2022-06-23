@@ -1,4 +1,17 @@
 
+MOMENTO HUMOR MINISHELL...
+
+Pa diagnostico, buscanos, pa diagnostico detallado, pues otra cosa...
+
+basicamente el problema era el que pensabamos, que no estaba ejecutando el pipe, pero es que claro, al procesar el nodo nuestro hijo enviaba los build in a sus respectivas funciones, sin tomar en cuenta la posibilidad de que un build in tuviese que pasar por la funcion ft_pipe.. no es una ternura?
+
+entonces claro, se quedaba pillado porque ejecutaba echo (sin fork ni pipes) y despues ejecutaba cat en un pipe solo triste y abandonado... una maravilla que llaman..
+
+hice solo un par de pruebas, asi que metele caña a ver si aguanta!
+si quieres, tambien el echo con * deberia trabajar, si lo pruebas y todo ok, lo implemento para todos los comandos...
+
+
+
 ======================
 INPUT
 ======================

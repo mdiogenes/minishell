@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 12:34:55 by mporras-          #+#    #+#             */
-/*   Updated: 2022/01/10 12:35:37 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/21 13:42:07 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,25 @@ typedef struct s_list
 //Extended
 char	*ft_strndup(const char *src, size_t len);
 size_t	ft_strlenchar(const char *s, char c);
+int		ft_strict_lenchar(const char *s, char c);
 size_t	ft_strnstr_len(const char *haystack, const char *needle, size_t len);
+char	*ft_strnstr_end(const char *haystack, const char *needle, size_t loc);
 char	*ft_strnjoin(char const *s1, char const *s2,
 			size_t len_s1, size_t len_s2);
-char	*get_next_line(int fd);
+char	*ft_strnjoin_clean(char *s1, char *s2,
+			size_t len_s1, size_t len_s2);
+char	*ft_strjoin_clean(char *s1, char *s2, int clean);
+char	*ft_strjoin_char(char const *s1, char const *s2, char sep);
+char	*ft_strjoin_clean_char(char *s1, char *s2, char sep, int clean);
+void	ft_clear_tabs(char **tab);
+int		ft_strict_n_cmp(char *s1, char *s2, size_t l1, size_t l2);
+int		ft_strict_cmp(char *s1, char *s2);
+size_t	ft_count_char(const char *s, char c);
+int		ft_strncmp_fnc(char *s1, char *s2, size_t n, int (*str_to)(int));
+void	ft_init_vector(int *vector,int value, int size);
+char	*ft_strtrim_clean(char *s1, char const *set);
 //gnl
+char	*get_next_line(int fd);
 int		ft_strlen_gnl(char *s);
 char	*ft_substr_gnl(char *s, int start, int len, int *nl_len);
 char	*ft_strdup_gnl(char *src, int len);
@@ -84,3 +98,5 @@ void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+
+#endif

@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/10 22:09:14 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/01 14:15:29 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/23 11:37:01 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,30 @@
 
 int	ft_read_from_node(char *token)
 {
-	static char		*command[] = {"'", "\"", "$", "pwd", "cd", "ls", "echo",
-		"export", "unset", "env", "exit", "./", "=", " =", "= ", " = ", "|", ">", ">>", "<", "<<"};
-	static size_t	sizes[TOKEN_ENUM] = {1, 1, 1, 3, 2, 2, 4,
-		6, 5, 3, 4, 2, 1, 2, 2, 3, 1, 1, 2, 1, 2};
-	int				i;
-	size_t			len;
-
+	int			i;
+	size_t		len;
+	size_t		sizes;
+	static char	*command[] = {"'", "\"", "$", "pwd", "cd", "echo", "export",
+		"unset", "env", "exit", "./", "=", " =", " = ", "= ", "|", ">", ">>",
+		"<", "<<", ";", "||", "&&", "(", ")"};
+	/*
+	static size_t	sizes[] = {1, 1, 1, 3, 2,4, 6, 5, 3,4,
+							2, 1, 2, 2,3, 1, 1, 2, 1,2};
+	*/
 	i = 0;
+	len = ft_strlen(token);
 	while (command[i])
 	{
-		len = ft_strlen(token);
-		if (len == sizes[i] && ft_strncmp(token, command[i], sizes[i]) == 0)
+		sizes = ft_strlen(command[i]);
+		if (len == sizes && ft_strncmp_fnc(token,
+				command[i], sizes, ft_tolower) == 0)
 			return (i + 1);
 		if (len > 2 && (i + 1) == CMD_EXE
-			&& ft_strncmp(token, command[i], sizes[i]) == 0)
+			&& ft_strncmp_fnc(token, command[i], sizes, ft_tolower) == 0)
 			return (i + 1);
-		if (token[0] == 39 && token[len - 1] == 39)
+		if (token[0] == '\'' && token[len - 1] == '\'')
 			return (CMD_LITERAL);
-		if (token[0] == 34 && token[len - 1] == 34)
+		if (token[0] == '\"' && token[len - 1] == 34)
 			return (CMD_EXPAND);
 		if (token[0] == '$')
 			return (CMD_ENV_VAR);
@@ -49,9 +54,19 @@ int	ft_get_meta_type(int type)
 		return (MTA_BUILDIN);
 	if (type > CMD_EXIT && type <= CMD_EXE)
 		return (MTA_OUTEXE);
-	if (type >= CMD_ASSIGN && type <= CMD_ASSIGN_BE)
+	if (type >= CMD_ASSIGN && type <= CMD_ASSIGN_LE)
 		return (MTA_ASSIGN);
-	if (type >= RDR_PIPE)
+	if (type >= CMD_ASSIGN_BE && type <= CMD_ASSIGN_RE)
+		return (MTA_ASSIGN_EMPTY);
+	if (type == RDR_PIPE)
 		return (MTA_REDIR);
+	if (type >= RDR_TO_FILE && type <= IMP_HEREDOC)
+		return (MTA_REDIR_FILE);
+	if (type == NEXT_CMD)
+		return (MTA_NEXT);
+	if (type >= OPR_OR && type <= OPR_AND)
+		return (MTA_OPERATOR);
+	if (type >= OPR_OPEN_K && type <= OPR_CLOSE_K)
+		return (MTA_KEYS);
 	return (MTA_NOTYPE);
 }

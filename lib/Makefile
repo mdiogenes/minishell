@@ -11,46 +11,55 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		=	ft_atoi.c \
-				ft_bzero.c \
-				ft_calloc.c \
-				ft_isalnum.c \
-				ft_isalpha.c \
-				ft_isascii.c \
-				ft_isdigit.c \
-				ft_isprint.c \
-				ft_memchr.c \
-				ft_memcmp.c \
-				ft_memcpy.c \
-				ft_memset.c \
-				ft_strchr.c \
-				ft_strdup.c \
-				ft_strlcat.c \
-				ft_strlcpy.c \
-				ft_strlen.c \
-				ft_strncmp.c \
-				ft_strnstr.c \
-				ft_strrchr.c \
-				ft_tolower.c \
-				ft_toupper.c \
-				ft_itoa.c \
-				ft_putchar_fd.c \
-				ft_putendl_fd.c \
-				ft_putnbr_fd.c \
-				ft_putstr_fd.c \
-				ft_split.c \
-				ft_striteri.c \
-				ft_strjoin.c \
-				ft_strmapi.c \
-				ft_strtrim.c \
-				ft_substr.c \
-				ft_memmove.c \
+SRCS		=	ft/ft_atoi.c \
+				ft/ft_bzero.c \
+				ft/ft_calloc.c \
+				ft/ft_isalnum.c \
+				ft/ft_isalpha.c \
+				ft/ft_isascii.c \
+				ft/ft_isdigit.c \
+				ft/ft_isprint.c \
+				ft/ft_memchr.c \
+				ft/ft_memcmp.c \
+				ft/ft_memcpy.c \
+				ft/ft_memset.c \
+				ft/ft_strchr.c \
+				ft/ft_strdup.c \
+				ft/ft_strlcat.c \
+				ft/ft_strlcpy.c \
+				ft/ft_strlen.c \
+				ft/ft_strncmp.c \
+				ft/ft_strnstr.c \
+				ft/ft_strrchr.c \
+				ft/ft_tolower.c \
+				ft/ft_toupper.c \
+				ft/ft_itoa.c \
+				ft/ft_putchar_fd.c \
+				ft/ft_putendl_fd.c \
+				ft/ft_putnbr_fd.c \
+				ft/ft_putstr_fd.c \
+				ft/ft_split.c \
+				ft/ft_striteri.c \
+				ft/ft_strjoin.c \
+				ft/ft_strmapi.c \
+				ft/ft_strtrim.c \
+				ft/ft_substr.c \
+				ft/ft_memmove.c \
 				gnl/gnl_gnl.c \
 				gnl/gnl_utl.c \
+				ext/ft_clear_tab.c \
+				ext/ft_count_char.c \
+				ext/ft_init_vector.c \
+				ext/ft_strict_cmp.c \
+				ext/ft_strjoin_char.c \
+				ext/ft_strjoin_clean.c \
 				ext/ft_strnstr_len.c \
 				ext/ft_strlenchar.c \
+				ext/ft_strncmp_fnc.c \
 				ext/ft_strnjoin.c \
+				ext/ft_strnstr_end.c \
 				ext/ft_strndup.c \
+				ext/ft_strtrim_clean.c \
 				lst/ft_lstadd_back.c \
 				lst/ft_lstadd_front.c \
 				lst/ft_lstclear.c \
@@ -62,14 +71,19 @@ SRCS		=	ft_atoi.c \
 				lst/ft_lstsize.c
 SRCS_DIR	=	srcs
 OBJS 		=	$(addprefix $(OBJS_DIR)/,$(SRCS:.c=.o))
-CC			=	@gcc
-RM			=	@rm -f
+OBJS_SUBS	= 	obj/ \
+				obj/ft \
+				obj/gnl \
+				obj/ext \
+				obj/lst
+CC			=	gcc
+RM			=	@rm -rf
 CFLAGS 		=	-Wall -Wextra -Werror -I.
 NAME		=	libft.a
 HEADER		=	inc/libft.h
 OBJS_DIR	=	obj
 
-all: $(NAME) $(HEADER)
+all: $(OBJS_SUBS) $(NAME) $(HEADER)
 
 $(NAME): $(OBJS)
 	ar rcs $(NAME) $(OBJS)
@@ -77,11 +91,15 @@ $(NAME): $(OBJS)
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
 	$(CC) -Iinc $(CFLAGS) -c $< -o $@
 
+$(OBJS_SUBS):
+	-mkdir $(OBJS_SUBS)
+
 clean:
 	$(RM) $(OBJS)
 
 fclean: clean
 	$(RM) $(NAME)
+	$(RM) $(OBJS_SUBS)
 
 re:	fclean $(NAME)
 

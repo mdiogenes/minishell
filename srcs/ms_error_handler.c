@@ -6,53 +6,45 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 21:31:17 by mporras-          #+#    #+#             */
-/*   Updated: 2022/05/27 09:50:50 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/23 11:10:56 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_error_export(t_token *token)
+int	ft_syntax_error(t_ms *mini, char token)
 {
-	if (token->type == CMD_ASSIGN)
-		return (SUCCESS);
+	ft_putstr_fd("ms-42 : syntax error near unexpected token `", STDERR_FILENO);
+	ft_putchar_fd(token, STDERR_FILENO);
+	ft_putstr_fd("'\n", STDERR_FILENO);
+	mini->exitstatus = 258;
+	return (mini->exitstatus);
+}
+
+int	ft_error_unset_var(char *msg, t_token *token, t_ms *mini)
+{
 	ft_putstr_fd("ms-42 ", STDERR_FILENO);
-	ft_putstr_fd("export : `", STDERR_FILENO);
-	if (token->type == CMD_ASSIGN_RE)
-	{
-		if (token->next)
-			ft_putstr_fd(token->next->token, STDERR_FILENO);
-	}
-	if (token->type == CMD_ASSIGN_LE || token->type == CMD_ASSIGN_BE)
-	{
+	ft_putstr_fd("unset : `", STDERR_FILENO);
+	if (token->token)
 		ft_putstr_fd(token->token, STDERR_FILENO);
-		if (token->next && token->type == CMD_ASSIGN_LE)
-			ft_putstr_fd(token->next->token, STDERR_FILENO);
+	if (token->args)
+	{
+		ft_putstr_fd("=", STDERR_FILENO);
+		ft_putstr_fd(token->args->token, STDERR_FILENO);
 	}
 	ft_putstr_fd("' ", STDERR_FILENO);
-	ft_putstr_fd(MSG_ERR_IDNT, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
-	if (token->type == CMD_ASSIGN_BE)
-	{
-		token->type = CMD_ASSIGN_RE;
-		return (ft_error_export(token));
-	}
-	return (ERROR);
-}
-int	ft_error_comands(char *cmd, char *msg)
-{
-	ft_putstr_fd("ms-42 ", STDERR_FILENO);
-	ft_putstr_fd(cmd, STDERR_FILENO);
-	ft_putstr_fd(" : ", STDERR_FILENO);
 	ft_putstr_fd(msg, STDERR_FILENO);
 	ft_putstr_fd("\n", STDERR_FILENO);
-	return (ERROR);
+	mini->exitstatus = 1;
+	ft_process_branch(mini);
+	return (mini->exitstatus);
 }
 
 int	ft_error_handler(int error, t_ms *mini)
 {
 	printf("ms-42 Error: %s\n", strerror(error));
-	ft_export_var("?", "1", SYS_HIDDEN, mini);
+	ft_process_branch(mini);
+	mini->exitstatus = 1;
 	return (ERROR);
 }
 
@@ -60,6 +52,15 @@ int	ft_error_free(int error, t_ms *mini)
 {
 	printf("ms-42 Error: %s\n", strerror(error));
 	ft_free_exit(mini);
-	exit (0);
-	return (ERROR);
+	mini->exitstatus = 1;
+	exit (mini->exitstatus);
+	return (mini->exitstatus);
+}
+
+void	ft_error_general(char *msg, t_ms *mini)
+{
+	printf("ms-42 Error: %s\n", msg);
+	ft_free_exit(mini);
+	mini->exitstatus = 1;
+	exit (mini->exitstatus);
 }
