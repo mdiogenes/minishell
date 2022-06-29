@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 13:28:40 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:30:24 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:21:05 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ int	check_args(t_token *token, int size, t_ms *mini)
 		}
 		else if (temp == 0)
 		{
-			printf("exit\n");
+			ft_putstr_fd("exit\n", STDERR_FILENO);
 			exit(ft_error_comands(ERR_EXIT,
 					mini->first_token->token, MSG_NUM_ARG, mini));
 		}

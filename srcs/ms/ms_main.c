@@ -1,46 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ms_main.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/05 22:27:34 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:00:02 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:34:59 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_token_dir(t_ms *mini)
-{
-	if (mini->first_token->meta <= MTA_BUILDIN)
-		ft_build_in(mini);
-	else if (mini->first_token->meta >= MTA_BUILDIN
-		&& mini->first_token->meta <= MTA_REDIR_FILE)
-		ft_out_bin(mini);
-	else if (mini->first_token->meta == MTA_OPERATOR)
-		ft_operator(mini);
-	else if (mini->first_token->meta == MTA_KEYS)
-		ft_keys_process(mini);
-}
-
-int	ft_process_inputs(t_ms *mini)
+static inline int	ft_process_inputs(t_ms *mini)
 {
 	if (mini->first_token == NULL)
 		return (ERROR);
 	while (mini->first_token)
-	{
-		if (mini->first_token->out == TKN_PIPEOUT)
-			ft_pipes(mini);
-		else
-			ft_token_dir(mini);
-	}
+		ft_token_dir(mini);
 	ft_clear_nodes(mini);
 	return (SUCCESS);
 }
 
-int	ft_parser_process(t_ms *mini)
+static inline int	ft_parser_process(t_ms *mini)
 {
 	if (ft_parse(mini) == ERROR)
 	{
@@ -54,7 +36,7 @@ int	ft_parser_process(t_ms *mini)
 	return (mini->exitstatus);
 }
 
-int	ft_get_input(t_ms *mini, int argc, char *argv[])
+static inline int	ft_get_input(t_ms *mini, int argc, char *argv[])
 {
 	using_history();
 	while (mini->status == 1)
@@ -90,15 +72,13 @@ int	main(int argc, char *argv[], char **envp)
 		ft_error_general("error copia envp", &mini);
 	mini_getpid(&mini);
 	home = ft_find_envar_export("HOME", &mini);
+	g_mini = &mini;
 	if (home)
 		mini.homecons = ft_strdup(home->args->token);
 	else
 		ft_error_general("error copia variable HOME", &mini);
 	if (ft_get_bin_paths(&mini) == ERROR)
 		ft_error_general("error obtencion PATH", &mini);
-	//ft_print_tree_debug("main entorno", mini.env);
-	//mini.hello(55);
-	//ft_print_argv(mini.bin_paths);
 	if (set_signal(&mini) == ERROR)
 		return (ERROR);
 	ft_get_input(&mini, argc, argv);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signals.c                                          :+:      :+:    :+:   */
+/*   ms_signals.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 10:44:24 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/06/22 11:51:49 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:41:50 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	signal_ctrld(t_ms *mini)
 	rl_on_new_line();
 	rl_redisplay();
 	ft_free_exit(mini);
-	printf("exit");
+	ft_putstr_fd("exit", STDERR_FILENO);
 	exit (0);
 }
 
@@ -26,7 +26,7 @@ void	signal_handler(int signum)
 {
 	if (signum == SIGINT)
 	{
-		printf("\n");
+		ft_putstr_fd("\n", STDERR_FILENO);
 		rl_replace_line("", 0);
 	}
 	if (signum == SIGQUIT)

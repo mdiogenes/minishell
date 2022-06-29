@@ -6,57 +6,64 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/26 12:42:06 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:38:50 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:28:33 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static inline void	ft_check_export_args(t_token **args)
+static inline int	ft_upd_re(t_token *node, t_token *prev)
 {
-	t_token	*node;
-	int		prev;
+	t_token	*tmp;
 
-	node = *args;
-	prev = MTA_TO_EXPORT;
-	while (node)
-	{
-		if (node->meta == MTA_ASSIGN || node->meta == MTA_ASSIGN_EMPTY)
-		{
-			prev = node->meta;
-			node = node->next;
-			continue ;
-		}
-		else if (prev == MTA_ASSIGN_EMPTY)
-			node->meta = MTA_TO_EXPORT;
-		else if (node->next && node->next->meta == MTA_ASSIGN)
-			node->meta = MTA_TO_EXPORT;
-		else if (node->next && node->next->meta != MTA_ASSIGN
-			&& (prev != MTA_ASSIGN))
-			node->meta = MTA_TO_EXPORT;
-		prev = node->meta;
-		node = node->next;
-	}
+	tmp = node->next;
+	free (node->token);
+	node->token = ft_strdup("\0");
+	node->meta = MTA_NULL_TOKEN;
+	prev->meta = MTA_TO_EXPORT;
+	prev->args = node;
+	prev->next = node->next;
+	prev->args->next = NULL;
+	return (SUCCESS);
 }
 
-static inline void	ft_args_export_err(t_token *node, t_ms *mini)
+static inline int	ft_upd_le(t_token *node, t_token *prev, t_token **head)
 {
-	if (!node || !node->args)
-		return ;
-	//ft_error_export(node->args, mini);
-	if (node->args->type == CMD_ASSIGN_RE)
+	if (node->next == NULL)
 	{
-		ft_delete_args(node->args);
-		node->args = ft_inp_new(ft_strdup("\"\""), mini);
+		node->meta = MTA_TO_EXPORT;
+		return (SUCCESS);
 	}
-	else
+	node = ft_remove_node(node, prev, head);
+	if (node)
 	{
-		ft_delete_args(node->args);
-		node->args = NULL;
+		node->token = ft_strjoin_clean("=", node->token, 2);
+		node->meta = MTA_TO_EXPORT;
 	}
+	return (SUCCESS);
 }
 
-static inline int	ft_clean_args_export(t_token **args, t_ms *mini)
+static inline int	ft_upd_assign(t_token *node, t_token *prev, t_token **head)
+{
+	if (prev == NULL && node->next == NULL)
+	{
+		node->meta = MTA_TO_EXPORT;
+		return (SUCCESS);
+	}
+	if (prev == NULL)
+		return (ft_upd_le(node, prev, head));
+	if (node->next == NULL)
+		return (ft_upd_re(node, prev));
+	prev->meta = MTA_TO_EXPORT;
+	prev->args = node->next;
+	prev->next = node->next->next;
+	prev->args->next = NULL;
+	ft_delete_node(node);
+	node = prev;
+	return (SUCCESS);
+}
+
+static inline void	ft_fix_args(t_token **args)
 {
 	t_token	*node;
 	t_token	*prev;
@@ -65,44 +72,22 @@ static inline int	ft_clean_args_export(t_token **args, t_ms *mini)
 	prev = NULL;
 	while (node)
 	{
-		if (node->args)
+		if (node->meta == MTA_ASSIGN || node->meta == MTA_ASSIGN_EMPTY)
 		{
-			if (node->args->type == CMD_ASSIGN)
-				ft_remove_node(node->args, NULL, &node->args);
-			else
-				ft_args_export_err(node, mini);
+			if (node->type == CMD_ASSIGN)
+				ft_upd_assign(node, prev, args);
+			else if (node->type == CMD_ASSIGN_LE)
+				ft_upd_le(node, prev, args);
+			else if (node->type == CMD_ASSIGN_RE)
+				ft_upd_re(node, prev);
+			else if (node->type == CMD_ASSIGN_BE)
+				node->meta = MTA_TO_EXPORT;
+			node = *args;
+			prev = NULL;
+			continue ;
 		}
+		node->meta = MTA_TO_EXPORT;
 		prev = node;
-		node = node->next;
-	}
-	return (SUCCESS);
-}
-
-static void	ft_arrange_nodes(t_token **args)
-{
-	t_token	*node;
-	t_token	*end;
-
-	node = *args;
-	while (node)
-	{
-		if (node->meta == MTA_TO_EXPORT
-			&& (node->next && node->next->meta != MTA_TO_EXPORT))
-		{
-			node->args = node->next;
-			end = node->next;
-			node->next = NULL;
-			while (end)
-			{
-				if (end->next && end->next->meta == MTA_TO_EXPORT)
-					break ;
-				end = end->next;
-			}
-			if (end != NULL)
-				node->next = end->next;
-			if (end != NULL)
-				end->next = NULL;
-		}
 		node = node->next;
 	}
 }
@@ -118,18 +103,10 @@ int	ft_check_input_export(t_ms *mini)
 	{
 		if (node->type == CMD_EXPORT)
 		{
-			ft_check_export_args(&node->args);
-			ft_print_tree_debug("check export; despues export args",mini->first_token);
-			ft_arrange_nodes(&node->args);
-			if(node->args && node->args->meta != MTA_TO_EXPORT)
-			{
-				node = ft_remove_node(node, prev, &mini->first_token);
-				continue ;
-			}
-			ft_print_tree_debug("check export; despues arrange args", mini->first_token);
-			ft_clean_args_export(&node->args, mini);
-			ft_print_tree_debug("check export; despues clean", mini->first_token);
-		}
+			ft_fix_args(&node->args);
+			ft_print_tree_debug("check export; despues fix args",
+				mini->first_token);
+		}	
 		prev = node;
 		node = node->next;
 	}

@@ -14,7 +14,6 @@
 
 int	ft_parse(t_ms *mini)
 {
-	mini->line = ft_strtrim_clean(mini->line, " \n\t");
 	if (ft_load_input(mini) == ERROR)
 		return (ERROR);
 	if (mini->first_token == NULL)
@@ -24,6 +23,22 @@ int	ft_parse(t_ms *mini)
 		return (ERROR);
 	ft_print_tree_debug("Parse. despues ft_workflow", mini->first_token);
 	return (SUCCESS);
+}
+
+void	ft_null_to_export(t_token **token, t_token *prev, t_ms *mini)
+{
+	t_token	*node;
+	t_token	*next;
+
+	node = *token;
+	next = node->next;
+	if (!next)
+		return ;
+	if (next->type == CMD_ASSIGN)
+		next->type = CMD_ASSIGN_LE;
+	if (next->type == CMD_ASSIGN_RE)
+		next->type = CMD_ASSIGN_BE;
+	*token = ft_remove_node(node, prev, &mini->first_token);
 }
 
 void	ft_clean_quotes(t_ms *mini)
@@ -43,6 +58,10 @@ void	ft_clean_quotes(t_ms *mini)
 				node->token = ft_strtrim_clean(node->token, "\"\'");
 				if (ft_strlen(node->token) == 0)
 					node->meta = MTA_NULL_TOKEN;
+				if (node->next
+					&& (node->next->meta == MTA_ASSIGN
+						|| node->next->meta == MTA_ASSIGN_EMPTY))
+					ft_null_to_export(&node, prev, mini);
 			}
 		}
 		prev = node;

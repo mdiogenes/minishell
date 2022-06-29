@@ -6,13 +6,13 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/31 12:56:30 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/22 13:46:33 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:18:08 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token	*ft_new_env(char *token, t_ms *mini)
+static inline t_token	*ft_new_env(char *token, t_ms *mini)
 {
 	t_token	*rst;
 
@@ -66,27 +66,11 @@ void	ft_export_var(char *var, char *val, t_ms *mini)
 		ft_delete_node(dst->args);
 		dst->args = ft_new_env(ft_strdup(val), mini);
 	}
-}
-
-int	ft_export_cmd(t_ms *mini)
-{
-	t_token	*token;
-	char	*value;
-
-	if (!mini->first_token->args)
-		return (ft_print_vars(mini));
-	token = mini->first_token->args;
-	while (token)
+	if (ft_strict_cmp(var, "PATH") == 0)
 	{
-		if (token->args)
-			value = token->args->token;
-		else
-			value = NULL;
-		ft_export_var(token->token, value, mini);
-		token = token->next;
+		ft_clear_tabs(mini->bin_paths);
+		mini->bin_paths = ft_split(val, ':');
 	}
-	ft_process_branch(mini);
-	return (SUCCESS);
 }
 
 int	ft_env_to_list(char **env, t_ms *mini)

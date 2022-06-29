@@ -12,6 +12,15 @@
 
 #include "minishell.h"
 
+int	ft_export_id_error(t_ms *mini, char *token)
+{
+	ft_putstr_fd("ms-42 : export `", STDERR_FILENO);
+	ft_putstr_fd(token, STDERR_FILENO);
+	ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
+	mini->exitstatus = 1;
+	return (ERROR);
+}
+
 int	ft_error_export(t_token *token, t_ms *mini)
 {
 	if (token->type == CMD_ASSIGN)

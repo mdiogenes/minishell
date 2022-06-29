@@ -6,13 +6,13 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/17 10:48:23 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/17 10:54:14 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:48:28 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-int		ft_strncmp_fnc(char *s1, char *s2, size_t n, int (*str_to)(int))
+int	ft_strncmp_fnc(char *s1, char *s2, size_t n, int (*str_to)(int))
 {
 	size_t	i;
 

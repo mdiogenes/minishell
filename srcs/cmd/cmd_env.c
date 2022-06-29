@@ -6,7 +6,7 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/16 09:17:56 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/06/17 15:38:25 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:23:54 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,12 @@ int	ft_env(t_ms *mini)
 		}
 		if (node->args)
 		{
-			printf("%s", node->token);
-			printf("=\"%s\"", node->args->token);
-			printf("\n");
+			ft_putstr_fd(node->token, STDERR_FILENO);
+			ft_putstr_fd("=\"", STDERR_FILENO);
+			ft_putstr_fd(node->args->token, STDERR_FILENO);
+			ft_putstr_fd("\"=\"", STDERR_FILENO);
+			ft_putstr_fd(node->args->token, STDERR_FILENO);
+			ft_putstr_fd("\"\n", STDERR_FILENO);
 		}
 		node = node->next;
 	}

@@ -30,20 +30,14 @@ t_token	*ft_find_envar(char *needle, t_token **prev, t_ms *mini)
 	return (NULL);
 }
 
-t_token	*ft_delete_env(t_token *node, t_token *prev, t_token **mini)
+t_token	*ft_delete_env(t_token *node, t_token *prev, t_ms *mini)
 {
-	t_token	*rst;
-
-	if (!node)
-		return (NULL);
-	if (prev == NULL)
-		*mini = node->next;
-	else
-		prev->next = node->next;
-	rst = node->next;
-	ft_delete_args(node->args);
-	ft_delete_node(node);
-	return (rst);
+	if (ft_strict_cmp(node->token, "PATH") == 0)
+	{
+		ft_clear_tabs(mini->bin_paths);
+		mini->bin_paths = NULL;
+	}
+	return (ft_remove_node(node, prev, &mini->env));
 }
 
 int	ft_valid_name(char *var, t_ms *mini)
@@ -76,7 +70,10 @@ int	ft_unset(t_ms *mini)
 		if (!del)
 			return (ft_error_unset_var(MSG_ERR_UNSET, node, mini));
 		else
-			ft_remove_node(del, prev, &mini->env);
+		{
+			node = ft_delete_env(del, prev, mini);
+			continue ;
+		}
 		node = node->next;
 	}
 	ft_process_branch(mini);

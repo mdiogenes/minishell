@@ -6,13 +6,13 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/18 00:27:59 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/18 00:28:02 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:27:02 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static inline char	*ft_is_bin_exe(char *token, t_ms *mini)
+static inline char	*ft_is_bin_exe(char *token, t_ms *mini, t_token *node)
 {
 	char		*to_test;
 	struct stat	data;
@@ -20,6 +20,11 @@ static inline char	*ft_is_bin_exe(char *token, t_ms *mini)
 	int			eval;
 
 	i = 0;
+	if (!mini->bin_paths)
+	{
+		node->status = FROM_NO_PATH;
+		return (NULL);
+	}
 	while (mini->bin_paths[i])
 	{
 		to_test = ft_strjoin_char(mini->bin_paths[i], token, '/');
@@ -34,7 +39,6 @@ static inline char	*ft_is_bin_exe(char *token, t_ms *mini)
 
 static inline int	ft_update_node(t_token *token, char *cmd)
 {
-	token->type = CMD_EXE;
 	token->meta = MTA_OUTEXE;
 	if (cmd == NULL)
 		return (IS_CMD);
@@ -65,7 +69,8 @@ int	ft_input_preprocess(t_ms *mini)
 			&& token->meta <= MTA_OUTEXE)
 			cmd = IS_CMD;
 		else if (cmd == NO_CMD && token->type <= CMD_LITERAL)
-			cmd = ft_update_node(token, ft_is_bin_exe(token->token, mini));
+			cmd = ft_update_node(token,
+					ft_is_bin_exe(token->token, mini, token));
 		else if (cmd == IS_CMD && token->meta >= MTA_BUILDIN
 			&& token->meta <= MTA_OUTEXE)
 			cmd = ft_update_arg(token);

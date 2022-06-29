@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/26 11:31:02 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/16 15:40:09 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 11:13:45 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,14 @@ void	ft_child_signals_msg(int signum)
 {
 	static char		*msg[] = {"", "", "", "", "", "", "",
 		"", "", "", "", "Segmentation fault", "", "", "", "", ""};
+	char			*sign;
 
-	printf("[ms-42 %s : %d]\n", msg[signum], signum);
+	sign = ft_itoa(signum);
+	ft_putstr_fd("[ms-42 ", STDERR_FILENO);
+	ft_putstr_fd(msg[signum], STDERR_FILENO);
+	ft_putstr_fd(" : ", STDERR_FILENO);
+	ft_putstr_fd(sign, STDERR_FILENO);
+	ft_putstr_fd("]\n", STDERR_FILENO);
+	if (sign)
+		free(sign);
 }

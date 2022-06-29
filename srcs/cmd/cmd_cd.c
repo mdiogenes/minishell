@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 22:25:12 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:16:13 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:28:15 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,8 @@ static char	*ft_get_to_go(t_ms *mini)
 		oldpath = ft_find_envar_export("OLDPWD", mini);
 		if (oldpath && oldpath->args && oldpath->args->token)
 		{
-			printf("%s\n", oldpath->args->token);
+			ft_putstr_fd(oldpath->args->token, STDERR_FILENO);
+			ft_putstr_fd("\n", STDERR_FILENO);
 			return (oldpath->args->token);
 		}
 		else

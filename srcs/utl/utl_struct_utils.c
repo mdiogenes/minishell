@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/05 23:23:45 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/22 11:48:00 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:18:35 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,6 @@ int	ft_init_minishell(t_ms *mini)
 	mini->homecons = NULL;
 	mini->prompt = NULL;
 	mini->env = NULL;
-	//mini->hello = ft_sayhello;
-	//mini->bin_paths = NULL;
 	ft_get_path_prompt(mini);
 	return (SUCCESS);
 }

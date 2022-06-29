@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/13 13:33:06 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:48:23 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 11:15:00 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,56 +34,50 @@ static inline void	ft_workflow_params(t_token *node)
 		node->next = NULL;
 }
 
-static inline int	ft_workflow_clean(t_token *node)
+static inline void	ft_workflow_rdr(t_token *node, t_token *prev)
 {
-	t_token	*tmp;
-
-	tmp = node->next;
-	if (tmp->meta >= MTA_REDIR_FILE && tmp->meta <= MTA_REDIR)
+	if (node->type == RDR_TO_FILE || node->type == RDR_APP_FILE)
 	{
-		node->out = TKN_PIPEOUT;
-		if (tmp->type == RDR_PIPE)
+		if (prev && prev->meta >= MTA_BUILDIN && prev->meta <= MTA_OUTEXE)
 		{
-			node->next = tmp->next;
-			ft_delete_node(tmp);
+			prev->out = TKN_PIPEOUT;
+			node->in = TKN_PIPEIN;
 		}
-		return (TKN_PIPEIN);
+		if (prev && prev->out == TKN_PIPEOUT)
+			node->in = TKN_PIPEIN;
+		if (node->in && node->next && (node->next->type == RDR_TO_FILE
+				|| node->next->type == RDR_APP_FILE))
+			node->out = TKN_PIPEOUT;
 	}
-	else if (tmp->type == NEXT_CMD)
-	{
-		if (tmp->next)
-			node->next = tmp->next;
-		else
-			node->next = NULL;
-		ft_delete_node(tmp);
-		return (TKN_STDIN);
-	}
-	return (TKN_STDIN);
+	else if (node->type == IMP_FROM_FILE || node->type == IMP_HEREDOC)
+		node->out = TKN_PIPEOUT;
 }
 
 static inline void	ft_workflow_redir(t_ms *mini)
 {
 	t_token	*node;
-	char	in;
+	t_token	*prev;
 
-	in = TKN_STDIN;
 	node = mini->first_token;
+	prev = NULL;
 	while (node)
 	{	
-		if (node->in != in)
-			node->in = in;
-		if (node->type >= IMP_FROM_FILE && node->type <= IMP_HEREDOC)
+		if (node->meta >= MTA_REDIR_FILE && node->meta <= MTA_REDIR)
 		{
-			node->out = TKN_PIPEOUT;
-			in = TKN_PIPEIN;
+			if (node->type == RDR_PIPE)
+			{
+				if (prev)
+					prev->out = TKN_PIPEOUT;
+				if (node->next)
+					node->next->in = TKN_PIPEIN;
+				node = ft_remove_node(node, prev, &mini->first_token);
+				continue ;
+			}
+			else if (node->type == IMP_FROM_FILE || node->type == IMP_HEREDOC
+				|| node->type == RDR_TO_FILE || node->type == RDR_APP_FILE)
+				ft_workflow_rdr(node, prev);
 		}
-		else if (node->next && node->next->meta >= MTA_REDIR_FILE
-			&& node->next->meta <= MTA_REDIR)
-			in = ft_workflow_clean(node);
-		else if (node->next && node->next->type == NEXT_CMD)
-			in = ft_workflow_clean(node);
-		else
-			in = TKN_STDIN;
+		prev = node;
 		node = node->next;
 	}
 }
@@ -135,12 +129,15 @@ int	ft_workflow(t_ms *mini)
 		}
 		node = node->next;
 	}
+	ft_print_tree_debug("ft_workflow; antesddeorder-while", mini->first_token);
 	ft_workflow_order(mini);
 	ft_print_tree_debug("ft_workflow; despues order", mini->first_token);
-	//ft_workflow_check(mini);
-	//ft_print_tree_debug("ft_workflow; despues check", mini->first_token);
 	ft_check_input_export(mini);
 	ft_print_tree_debug("ft_workflow; despues input export", mini->first_token);
 	ft_workflow_redir(mini);
+	ft_inp_redir(mini);
+	ft_print_tree_debug("ft_workflow; despues redirs", mini->first_token);
+	ft_workflow_check(mini);
+	ft_print_tree_debug("ft_workflow; despues check", mini->first_token);
 	return (SUCCESS);
 }

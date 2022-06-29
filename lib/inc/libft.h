@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/10 12:34:55 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/21 13:42:07 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:47:07 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int		ft_strict_n_cmp(char *s1, char *s2, size_t l1, size_t l2);
 int		ft_strict_cmp(char *s1, char *s2);
 size_t	ft_count_char(const char *s, char c);
 int		ft_strncmp_fnc(char *s1, char *s2, size_t n, int (*str_to)(int));
-void	ft_init_vector(int *vector,int value, int size);
+void	ft_init_vector(int *vector, int value, int size);
 char	*ft_strtrim_clean(char *s1, char const *set);
 //gnl
 char	*get_next_line(int fd);

@@ -6,7 +6,7 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/10 12:48:21 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/06/22 14:18:20 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:26:01 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int	ft_echo_ls_print(DIR *dir, t_ms *mini, char *pattern)
 		if (flt != IS_FALSE)
 		{
 			if (rst != 0)
-				printf(" ");
+				ft_putstr_fd(" ", STDERR_FILENO);
 			rst += printf("%s", files->d_name);
 		}
 	}
@@ -51,7 +51,7 @@ int	ft_echo_ls(t_ms *mini, char *pattern)
 		return (ft_error_handler(errno, mini));
 	rst = ft_echo_ls_print(dir, mini, pattern);
 	if (rst != 0)
-		printf("\n");
+		ft_putstr_fd("\n", STDERR_FILENO);
 	closedir(dir);
 	mini->exitstatus = 0;
 	return (SUCCESS);
@@ -65,12 +65,10 @@ void	ft_echo_wild(t_token *token, t_ms *mini)
 		ft_echo_ls(mini, token->token);
 }
 
-int	ft_echo_args(t_ms *mini, t_token *args, int opcio)
+int	ft_echo_args(t_ms *mini, t_token *args, int opcio, int n)
 {
 	t_token	*token;	
-	int		n;
 
-	n = 0;
 	token = args;
 	while (token)
 	{
@@ -82,8 +80,11 @@ int	ft_echo_args(t_ms *mini, t_token *args, int opcio)
 				opcio = 1;
 			else
 			{
+				if (ft_strict_cmp(token->token, "~") == 0)
+					ft_putstr_fd(mini->homecons, STDOUT_FILENO);
+				else
+					ft_putstr_fd(token->token, STDOUT_FILENO);
 				n = 1;
-				ft_putstr_fd(token->token, STDOUT_FILENO);
 			}
 			if (token->next && (opcio == 0 || n == 1))
 				ft_putstr_fd(" ", STDOUT_FILENO);
@@ -96,10 +97,13 @@ int	ft_echo_args(t_ms *mini, t_token *args, int opcio)
 int	ft_echo(t_ms *mini)
 {
 	int		opcio;
+	int		n;
 
+	n = 0;
 	opcio = 0;
-	opcio = ft_echo_args(mini, mini->first_token->args, opcio);
-	if (opcio == 0)
+	opcio = ft_echo_args(mini, mini->first_token->args, opcio, n);
+	if (opcio == 0 || mini->first_token->in != TKN_STDIN
+		|| mini->first_token->in != TKN_PIPEIN)
 		ft_putstr_fd("\n", STDOUT_FILENO);
 	ft_process_branch(mini);
 	return (SUCCESS);

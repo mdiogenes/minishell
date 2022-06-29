@@ -6,34 +6,39 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/10 22:09:14 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:37:01 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/16 15:14:37 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+char	*ft_directory(int i)
+{
+	static char	*command[] = {"'", "\"", "$", "pwd", "cd",
+		"echo", "export", "unset", "env",
+		"exit", "./", "=", " =", " = ",
+		"= ", "|", ">", ">>", "<",
+		"<<", ";", "||", "&&", "(", ")"};
+
+	return (command[i]);
+}
 
 int	ft_read_from_node(char *token)
 {
 	int			i;
 	size_t		len;
 	size_t		sizes;
-	static char	*command[] = {"'", "\"", "$", "pwd", "cd", "echo", "export",
-		"unset", "env", "exit", "./", "=", " =", " = ", "= ", "|", ">", ">>",
-		"<", "<<", ";", "||", "&&", "(", ")"};
-	/*
-	static size_t	sizes[] = {1, 1, 1, 3, 2,4, 6, 5, 3,4,
-							2, 1, 2, 2,3, 1, 1, 2, 1,2};
-	*/
+
 	i = 0;
 	len = ft_strlen(token);
-	while (command[i])
+	while (ft_directory(i))
 	{
-		sizes = ft_strlen(command[i]);
-		if (len == sizes && ft_strncmp_fnc(token,
-				command[i], sizes, ft_tolower) == 0)
+		sizes = ft_strlen(ft_directory(i));
+		if (len == sizes
+			&& ft_strncmp_fnc(token, ft_directory(i), sizes, ft_tolower) == 0)
 			return (i + 1);
 		if (len > 2 && (i + 1) == CMD_EXE
-			&& ft_strncmp_fnc(token, command[i], sizes, ft_tolower) == 0)
+			&& ft_strncmp_fnc(token, ft_directory(i), sizes, ft_tolower) == 0)
 			return (i + 1);
 		if (token[0] == '\'' && token[len - 1] == '\'')
 			return (CMD_LITERAL);

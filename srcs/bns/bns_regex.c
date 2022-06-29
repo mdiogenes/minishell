@@ -6,13 +6,14 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 21:17:26 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/16 21:17:35 by mporras-         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:33:22 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	ft_regex_wc(char *haystack, char *pattern, size_t *it, size_t *len_h_p)
+static int	ft_regex_wc(char *haystack,
+		char *pattern, size_t *it, size_t *len_h_p)
 {
 	if (it[1] < len_h_p[1])
 	{
@@ -41,7 +42,8 @@ static int	ft_regex_lit(char *haystack, char *pattern, size_t *ih, size_t *ip)
 	return (IS_TRUE);
 }
 
-static void	ft_init_lens(char *haystack, char *pattern, size_t *lens, size_t *iter)
+static void	ft_init_lens(char *haystack,
+		char *pattern, size_t *lens, size_t *iter)
 {
 	lens[1] = ft_strlen(pattern);
 	lens[0] = ft_strlen(haystack);

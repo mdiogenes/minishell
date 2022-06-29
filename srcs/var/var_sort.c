@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   var_envars.c                                       :+:      :+:    :+:   */
+/*   var_sort.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/30 21:09:07 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/16 14:55:35 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:17:55 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_compare_sort(char *s1, char *s2)
+static inline int	ft_compare_sort(char *s1, char *s2)
 {
 	size_t	len_s1;
 	size_t	len_s2;
@@ -61,31 +61,4 @@ void	ft_env_sort(t_token **first_env, t_token *new)
 		node = node->next;
 	}
 	prev->next = new;
-}
-
-int	ft_print_vars(t_ms *mini)
-{
-	t_token	*node;
-
-	node = mini->env;
-	while (node)
-	{
-		if (node->type == SYS_HIDDEN)
-		{
-			node = node->next;
-			continue ;
-		}
-		printf("declare -x %s", node->token);
-		if (node->args)
-		{
-			if (ft_strict_cmp(node->args->token, "\"\"") == 0)
-				printf("=\"\"");
-			else
-				printf("=\"%s\"", node->args->token);
-		}
-		printf("\n");
-		node = node->next;
-	}
-	ft_process_branch(mini);
-	return (SUCCESS);
 }

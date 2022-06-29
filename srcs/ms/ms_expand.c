@@ -6,13 +6,13 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 12:51:51 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/06/17 15:04:29 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:21:27 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	ft_change_var(char **dst, int *i_j, char **str, t_ms *mini)
+static inline void	ft_change_var(char **dst, int *i_j, char **str, t_ms *mini)
 {
 	t_token	*node;
 	char	*var;
@@ -41,7 +41,8 @@ void	ft_change_var(char **dst, int *i_j, char **str, t_ms *mini)
 	i_j[1] = i_j[0];
 }
 
-void	ft_caseinterr_digit(char *str, char **dst, int *i_j, t_ms *mini)
+static inline void	ft_caseinterr_digit(char *str,
+		char **dst, int *i_j, t_ms *mini)
 {
 	char	*tmp;
 
@@ -70,7 +71,7 @@ void	ft_caseinterr_digit(char *str, char **dst, int *i_j, t_ms *mini)
 	}
 }
 
-void	ft_rarecase(char *str, char **dst, int *i_j, t_ms *mini)
+static inline void	ft_rarecase(char *str, char **dst, int *i_j, t_ms *mini)
 {
 	int		len;
 
@@ -95,7 +96,7 @@ void	ft_rarecase(char *str, char **dst, int *i_j, t_ms *mini)
 	}
 }
 
-int	ft_expand_node(t_ms *mini, t_token *node)
+static inline int	ft_expand_node(t_ms *mini, t_token *node)
 {
 	char		*dst;
 	int			i_j[2];

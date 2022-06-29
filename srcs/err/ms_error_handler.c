@@ -6,19 +6,25 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 21:31:17 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:10:56 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:09:37 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	ft_syntax_error(t_ms *mini, char token)
+int	ft_syntax_error(t_ms *mini, char token, int rpt)
 {
 	ft_putstr_fd("ms-42 : syntax error near unexpected token `", STDERR_FILENO);
-	ft_putchar_fd(token, STDERR_FILENO);
+	if (token == '\n')
+		ft_putstr_fd("newline", STDERR_FILENO);
+	else
+	{
+		while (rpt--)
+			ft_putchar_fd(token, STDERR_FILENO);
+	}
 	ft_putstr_fd("'\n", STDERR_FILENO);
 	mini->exitstatus = 258;
-	return (mini->exitstatus);
+	return (ERROR);
 }
 
 int	ft_error_unset_var(char *msg, t_token *token, t_ms *mini)
@@ -42,7 +48,9 @@ int	ft_error_unset_var(char *msg, t_token *token, t_ms *mini)
 
 int	ft_error_handler(int error, t_ms *mini)
 {
-	printf("ms-42 Error: %s\n", strerror(error));
+	ft_putstr_fd("ms-42 Error:", STDERR_FILENO);
+	ft_putstr_fd(strerror(error), STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
 	ft_process_branch(mini);
 	mini->exitstatus = 1;
 	return (ERROR);
@@ -50,7 +58,9 @@ int	ft_error_handler(int error, t_ms *mini)
 
 int	ft_error_free(int error, t_ms *mini)
 {
-	printf("ms-42 Error: %s\n", strerror(error));
+	ft_putstr_fd("ms-42 Error:", STDERR_FILENO);
+	ft_putstr_fd(strerror(error), STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
 	ft_free_exit(mini);
 	mini->exitstatus = 1;
 	exit (mini->exitstatus);
@@ -59,7 +69,9 @@ int	ft_error_free(int error, t_ms *mini)
 
 void	ft_error_general(char *msg, t_ms *mini)
 {
-	printf("ms-42 Error: %s\n", msg);
+	ft_putstr_fd("ms-42 Error:", STDERR_FILENO);
+	ft_putstr_fd(msg, STDERR_FILENO);
+	ft_putstr_fd("\n", STDERR_FILENO);
 	ft_free_exit(mini);
 	mini->exitstatus = 1;
 	exit (mini->exitstatus);

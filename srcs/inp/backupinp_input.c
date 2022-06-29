@@ -6,17 +6,15 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/10 20:54:43 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/29 11:10:11 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 10:59:24 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static inline int	ft_clear_spaces(char *line, int i)
+static inline int	ft_clear_spaces(char c)
 {
-	while (line[i] == ' ' || line[i] == '\n' || line[i] == '\t')
-		i++;
-	return (i);
+	return (c == ' ' || c == '\n' || c == '\t');
 }
 
 static inline char	*ft_strdup_input(char *src, size_t len, t_ms *mini)
@@ -64,7 +62,8 @@ int	ft_load_input(t_ms *mini)
 	mini->line = ft_strtrim_clean(mini->line, " \n\t");
 	while (mini->line[++i])
 	{
-		i = ft_clear_spaces(mini->line, i);
+		while (ft_clear_spaces(mini->line[i]))
+			i++;
 		if (mini->line[i] == '\'' || mini->line[i] == '\"')
 			len = ft_strlen_chars(&mini->line[i], mini->line[i]);
 		else

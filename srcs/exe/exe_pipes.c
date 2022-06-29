@@ -6,33 +6,11 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 21:21:52 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/22 13:44:03 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:29:23 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	ft_close_pipes(t_ms *mini, int n)
-{
-	close(mini->pipes[n][PIPE_READ]);
-	close(mini->pipes[n][PIPE_WRITE]);
-}
-
-static inline int	**ft_build_pipes(int n, t_ms *mini)
-{
-	int	**rst;
-
-	rst = (int **)malloc(sizeof(int *) * n);
-	if (!rst)
-		ft_error_free(errno, mini);
-	while (n--)
-	{
-		rst[n] = (int *)malloc(sizeof(int) * 2);
-		if (!rst[n])
-			ft_error_free(errno, mini);
-	}
-	return (rst);
-}
 
 static inline int	ft_count_pipes(t_ms *mini)
 {
@@ -51,11 +29,26 @@ static inline int	ft_count_pipes(t_ms *mini)
 	return (i - 1);
 }
 
+static inline int	**ft_build_pipes(int n, t_ms *mini)
+{
+	int	**rst;
+
+	rst = (int **)malloc(sizeof(int *) * n);
+	if (!rst)
+		ft_error_free(errno, mini);
+	while (n--)
+		rst[n] = (int *)malloc(sizeof(int) * 2);
+	return (rst);
+}
+
 int	ft_pipes(t_ms *mini)
 {
 	t_token	*token;
 	int		n;
+	int		total;
+	pid_t	child;
 
+	total = ft_count_pipes(mini);
 	mini->pipes = ft_build_pipes(ft_count_pipes(mini), mini);
 	n = 0;
 	token = mini->first_token;
@@ -63,9 +56,16 @@ int	ft_pipes(t_ms *mini)
 	{
 		if (token->out == TKN_PIPEOUT)
 			pipe(mini->pipes[n]);
-		ft_fork_and_run(mini, n, ft_process_branch);
+		child = ft_fork_and_run(mini, n, NULL, NULL);
+		if (token->in == TKN_PIPEIN)
+			close(mini->pipes[n - 1][PIPE_READ]);
+		if (token->out == TKN_PIPEOUT)
+			close(mini->pipes[n][PIPE_WRITE]);
+		ft_process_branch(mini);
 		token = mini->first_token;
 		n++;
 	}
+	close(mini->pipes[n - 2][PIPE_READ]);
+	ft_child_monitor(mini, total + 1, child);
 	return (SUCCESS);
 }

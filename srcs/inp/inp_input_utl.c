@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/21 20:58:05 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:41:54 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/28 14:25:40 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,13 +43,38 @@ static inline size_t	ft_strlen_to(const char *s, int scn)
 	return (i);
 }
 
+static inline void	ft_fix_reserved(char *s, size_t *len)
+{
+	size_t	i;
+	char	c;
+
+	i = 0;
+	c = s[0];
+	while (s[i] == c && i < *len)
+		i++;
+	if (*len == i)
+		return ;
+	*(len) = *(len) - i;
+}
+
 int	ft_load_strlen(t_ms *mini, char *s, int scn, size_t *len)
 {
 	*(len) = ft_strlen_to(s, scn);
-	if (s[0] == '>' || s[0] == '<' || s[0] == '|')
+	if (s[0] == '>' || s[0] == '<' || s[0] == '|' || s[0] == '&')
 	{
+		ft_fix_reserved(s, len);
 		if (*(len) >= 3)
-			return (ft_syntax_error(mini, s[0]));
+		{
+			if (*(len) >= 4)
+				return (ft_syntax_error(mini, s[0], 2));
+			return (ft_syntax_error(mini, s[0], 1));
+		}
+		return (SUCCESS);
+	}
+	if (s[0] == ';')
+	{
+		if (*(len) > 1)
+			return (ft_syntax_error(mini, s[0], 2));
 		return (SUCCESS);
 	}
 	return (SUCCESS);

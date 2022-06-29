@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/05 22:36:51 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/23 11:08:37 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/29 11:04:57 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@
 # define FROM_PARSE 0
 # define FROM_WILDCARD 1
 # define FROM_EXPAND 2
+# define FROM_NO_PATH 3
 //error used by bash
 # define EX_RETRYFAIL	124
 # define EX_WEXPCOMSUB	125
@@ -143,6 +144,7 @@ typedef struct s_token
 typedef struct s_ms
 {
 	int				**pipes;
+	int				pipe[2];
 	int				status;
 	long long int	exitstatus;
 	int				pid;
@@ -153,17 +155,16 @@ typedef struct s_ms
 	struct s_token	*first_token;
 	struct s_token	*env;
 	char			**bin_paths;
-	//int (*hello)(int);
 }	t_ms;
 
 //DEBUG
 # define COUNT 10
-int	mini_getpid(t_ms *mini);
 
+t_ms	*g_mini;
+int		ft_inp_redir(t_ms *mini);
 void	ft_print_tree_debug(char *function, t_token *node);
 void	ft_print_argv(char *argv[]);
 void	ft_test(t_ms *mini);
-
 
 //bns_logic.c
 int		ft_operator(t_ms *mini);
@@ -182,16 +183,21 @@ int		ft_echo(t_ms *mini);
 int		ft_env(t_ms *mini);
 //cmd_exit.c
 int		ft_exit(t_ms *mini);
+//cmd_export.c
+int		ft_export_cmd(t_ms *mini);
 //cmd_pwd.c
 int		ft_pwd(t_ms *mini);
+//cmd_redirs.c
+int		ft_dup_file(t_ms *mini);
+int		ft_inp_from_file(t_ms *mini);
+int		ft_heredoc(t_ms *mini);
 //cmd_unset.c
 int		ft_unset(t_ms *mini);
 //exe_exec.c
-int		ft_child_monitor(t_ms *mini, int n, pid_t child);
-void	ft_child_exec(t_ms *mini, char **argv, char **envp, int n);
-int		ft_fork_and_run(t_ms *mini, int n, int (*process)(t_ms *));
+int		ft_child_monitor(t_ms *mini, int total, pid_t pid);
+pid_t	ft_fork_and_run(t_ms *mini, int n, int (*process)(t_ms *),
+			int (*wait_exit)(t_ms *, int, pid_t));
 //exe_pipes.c
-void	ft_close_pipes(t_ms *mini, int n);
 int		ft_pipes(t_ms *mini);
 //exe_sandbox.c
 void	ft_child_sandbox(t_ms *mini, int (f)(t_ms *), int n);
@@ -211,27 +217,37 @@ int		ft_open_nodes(t_ms *mini);
 //inp_parse.c
 int		ft_parse(t_ms *mini);
 void	ft_clean_quotes(t_ms *mini);
-void 	ft_prepare_node(t_ms *mini, t_token *token);
+void	ft_prepare_node(t_ms *mini, t_token *token);
 //inp_preprocess.c
 int		ft_input_preprocess(t_ms *mini);
 //inp_workflow.c
 int		ft_workflow(t_ms *mini);
 //inp_workflow_check.c
 void	ft_workflow_check(t_ms *mini);
-//rdr_functions.c
-int		ft_dup_file(t_ms *mini);
-int		ft_inp_from_file(t_ms *mini);
-int		ft_heredoc(t_ms *mini);
+//ms_expand.c
+int		ft_get_expand(t_ms *mini, t_token *node);
+//ms_process.c
+void	ft_token_dir(t_ms *mini);
+int		ft_build_in(t_ms *mini);
+int		ft_out_bin(t_ms *mini);
+//ms_signals.c
+int		set_signal(t_ms *mini);
+void	signal_ctrld(t_ms *mini);
+void	signal_handler(int signum);
 //utl_args.c
 void	ft_get_line_argv(t_ms *mini, char *argv[]);
 char	**ft_build_argv(t_ms *mini, t_token *token);
 char	**ft_build_arenv(t_ms *mini);
 int		ft_delete_args(t_token *node);
+//utl_atoi_test.c
+int		ft_send_to_atoi(char *str);
 //utl_cleaning.c
 int		ft_delete_node(t_token *node);
 int		ft_process_branch(t_ms *mini);
 t_token	*ft_remove_node(t_token *node, t_token *prev, t_token **head);
 void	ft_clear_nodes(t_ms *mini);
+//utl_getpid.c
+int		mini_getpid(t_ms *mini);
 //utl_list.c
 int		ft_size_branch(t_token *lst);
 size_t	ft_count_node(t_ms *mini);
@@ -240,63 +256,24 @@ t_token	*ft_inp_new(char *cmd, t_ms *mini);
 //utl_strings.c
 int		ft_is_reserved(char c);
 void	ft_join_str(char **dst, char **str, int in, int fin);
-void join_dst_pid(char *str, char **dst, int *i_j, t_ms *mini);
+void	join_dst_pid(char *str, char **dst, int *i_j, t_ms *mini);
 int		ft_var_valid_name(char a);
-
+//var_export.c
+t_token	*ft_find_envar_export(char *needle, t_ms *mini);
+void	ft_export_var(char *var, char *val, t_ms *mini);
+int		ft_env_to_list(char **env, t_ms *mini);
+//var_sort.c
+void	ft_env_sort(t_token **first_env, t_token *new);
 //utl_struct_utils.c
 void	ft_free_exit(t_ms *mini);
 void	ft_get_path_prompt(t_ms *mini);
 int		ft_get_bin_paths(t_ms *mini);
 int		ft_init_minishell(t_ms *mini);
-int		ft_send_to_atoi(char *str);
-void	ft_token_dir(t_ms *mini);
-int		ft_process_inputs(t_ms *mini);
-
-//
-void	ft_export_var(char *var, char *val, t_ms *mini);
-int		ft_export_cmd(t_ms *mini);
-void	ft_env_sort(t_token **first_env, t_token *new);
-int		ft_expand_envar(t_token *node, t_ms *mini);
-int		ft_env_to_list(char **env, t_ms *mini);
-int		ft_print_vars(t_ms *mini);
 
 //err msg
 void	ft_child_signals_msg(int signum);
-//redir
-
-
-//input preprocess
-int		ft_check_input_export(t_ms *mini);
-int		ft_input_preprocess(t_ms *mini);
-
-
-//process
-int		ft_build_in(t_ms *mini);
-int		ft_out_bin(t_ms *mini);
-int		ft_operator(t_ms *mini);
-int		ft_keys_process(t_ms *mini);
-//DEBUG
-
-//cleaning
-void	ft_clear_pipes(int **pipes);
-void	ft_clear_tabs(char **tab);
-
-
-
-//struct utils
-
-
-
-//forks
-size_t	ft_count_args(t_token *token);
-
-//input
-int		ft_load_input(t_ms *mini);
-int		ft_get_expand(t_ms *mini, t_token *node);
-
-
-// errors
-int		ft_syntax_error(t_ms *mini, char token);
+int		ft_syntax_error(t_ms *mini, char token, int rpt);
+int		ft_export_id_error(t_ms *mini, char *token);
 void	ft_error_general(char *msg, t_ms *mini);
 int		ft_error_export(t_token *token, t_ms *mini);
 int		ft_error_export_var(t_token *token, t_ms *mini);
@@ -304,15 +281,5 @@ int		ft_error_comands(int error, char *cmd, char *msg, t_ms *mini);
 int		ft_error_handler(int error, t_ms *mini);
 int		ft_error_free(int error, t_ms *mini);
 int		ft_error_unset_var(char *msg, t_token *token, t_ms *mini);
-
-// strings
-
-// list utils
-
-
-t_token	*ft_find_envar_export(char *needle, t_ms *mini);
-
 //void	rl_replace_line (const char *text, int clear_undo);
-int		set_signal(t_ms *mini);
-void	signal_ctrld(t_ms *mini);
 #endif
