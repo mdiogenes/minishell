@@ -6,13 +6,13 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 13:28:40 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/29 10:21:05 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/07/06 13:15:57 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	all_isdigit(t_token *token)
+static inline int	all_isdigit(t_token *token)
 {
 	int	n;
 
@@ -29,28 +29,26 @@ int	check_args(t_token *token, int size, t_ms *mini)
 	temp = 0;
 	while (token)
 	{
-		if (all_isdigit(token) || token->token[0] == '-')
+		if (all_isdigit(token)
+			|| token->token[0] == '-' || token->token[0] == '+')
 		{	
 			temp = 1;
 			if (ft_send_to_atoi(token->token) == 1)
 				mini->exitstatus = ft_atoi(token->token);
 			else
 				exit(ft_error_comands(ERR_EXIT,
-						mini->first_token->token, MSG_NUM_ARG, mini));
+						mini->first_token->token, MSG_NUM_ARG, ft_free_exit));
 		}
 		else if (temp == 0)
-		{
-			ft_putstr_fd("exit\n", STDERR_FILENO);
 			exit(ft_error_comands(ERR_EXIT,
-					mini->first_token->token, MSG_NUM_ARG, mini));
-		}
+					mini->first_token->token, MSG_NUM_ARG, ft_free_exit));
 		token = token->next;
-		size ++;
+		size++;
 	}
 	return (size);
 }
 
-int	normalize_number_exit(t_ms *mini)
+static inline int	normalize_number_exit(t_ms *mini)
 {
 	int	n;
 
@@ -59,6 +57,8 @@ int	normalize_number_exit(t_ms *mini)
 		n = (mini->exitstatus - ((mini->exitstatus / 256) * 256));
 	if (mini->exitstatus < 0)
 		n = (256 - (((mini->exitstatus / 256) * 256) - mini->exitstatus));
+	if (mini->exitstatus < 256 && mini->exitstatus >= 0)
+		n = mini->exitstatus;
 	return (n);
 }
 
@@ -83,7 +83,7 @@ int	ft_exit(t_ms *mini)
 		exit(mini->exitstatus);
 	}
 	if (size > 1)
-		mini->exitstatus = ft_error_comands(ERR_EXIT, mini->first_token->token,
-				MSG_MANY_ARG, mini);
+		ft_error_comands(ERR_EXIT, mini->first_token->token,
+			MSG_MANY_ARG, ft_process_branch);
 	return (mini->exitstatus);
 }

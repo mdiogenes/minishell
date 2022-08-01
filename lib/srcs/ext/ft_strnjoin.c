@@ -44,8 +44,8 @@ char	*ft_strnjoin_clean(char *s1, char *s2,
 		ft_memcpy(&rst[len_s1], s2, len_s2);
 	rst[len_s1 + len_s2] = 0;
 	if (s1)
-		free(s1);
+		ft_safe_free_char(&s1);
 	if (s2)
-		free(s2);
+		ft_safe_free_char(&s2);
 	return (rst);
 }

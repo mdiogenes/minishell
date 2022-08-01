@@ -6,7 +6,7 @@
 /*   By: msoler-e <msoler-e@student.42barcel>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 10:44:24 by msoler-e          #+#    #+#             */
-/*   Updated: 2022/06/28 14:41:50 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/07/07 14:14:34 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,39 +14,41 @@
 
 void	signal_ctrld(t_ms *mini)
 {
-	mini->exitstatus = 1;
-	rl_on_new_line();
-	rl_redisplay();
-	ft_free_exit(mini);
-	ft_putstr_fd("exit", STDERR_FILENO);
-	exit (0);
+	long long int	exit_sts;
+
+	if (g_mini->pid_child == 0)
+	{
+		exit_sts = mini->exitstatus;
+		rl_on_new_line();
+		rl_redisplay();
+		ft_free_exit(mini);
+		ft_putendl_fd("exit", STDOUT_FILENO);
+		exit (exit_sts);
+	}
 }
 
 void	signal_handler(int signum)
 {
-	if (signum == SIGINT)
+	if (signum == SIGINT && g_mini->process == IMP_HEREDOC)
 	{
-		ft_putstr_fd("\n", STDERR_FILENO);
-		rl_replace_line("", 0);
+		ft_safe_free_char(&g_mini->first_token->stored);
+		ft_safe_free_char(&g_mini->stored);
+		ft_putendl_fd("", STDERR_FILENO);
+		exit (1);
 	}
-	if (signum == SIGQUIT)
+	if (signum == SIGINT && g_mini->pid_child == 0)
+	{
+		ioctl(STDIN_FILENO, TIOCSTI, "\n");
 		rl_replace_line("", 0);
-	rl_on_new_line();
-	rl_redisplay();
+		rl_on_new_line();
+	}
 }
 
-int	set_signal(t_ms *mini)
+int	set_signal(void)
 {
-	struct termios	term;
-
-	if (tcgetattr(STDIN_FILENO, &term) == -1)
-		return (ERROR);
-	term.c_lflag &= ~(ECHOCTL);
-	if (tcsetattr(STDIN_FILENO, TCSANOW, &term) == -1)
-		return (ERROR);
 	if (signal(SIGINT, signal_handler) == SIG_ERR)
-		return (ft_error_free(errno, mini));
-	if (signal(SIGQUIT, signal_handler) == SIG_ERR)
-		return (ft_error_free(errno, mini));
+		return (ft_error_signals(errno, g_mini));
+	if (signal(SIGQUIT, SIG_IGN) == SIG_ERR)
+		return (ft_error_signals(errno, g_mini));
 	return (SUCCESS);
 }

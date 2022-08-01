@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static int	ft_regex_wc(char *haystack,
+static inline int	ft_regex_wc(char *haystack,
 		char *pattern, size_t *it, size_t *len_h_p)
 {
 	if (it[1] < len_h_p[1])
@@ -21,6 +21,15 @@ static int	ft_regex_wc(char *haystack,
 		while (haystack[it[0]] && haystack[it[0]] != pattern[it[1]])
 			it[0] += 1;
 		if (it[0] == 0 && it[1] > 0)
+		{
+			if (it[1] < len_h_p[1] && it[0] < len_h_p[0])
+			{
+				it[1] -= 1;
+				it[0] += 1;
+			}
+		}
+		if ((it[1] == len_h_p[1] && it[0] != len_h_p[0])
+			|| (len_h_p[0] - it[0] < len_h_p[1] - it[1]))
 			return (IS_FALSE);
 		return (IS_TRUE);
 	}
@@ -28,17 +37,38 @@ static int	ft_regex_wc(char *haystack,
 		return (IS_TRUE);
 }
 
-static int	ft_regex_lit(char *haystack, char *pattern, size_t *ih, size_t *ip)
+static inline void	ft_back_pattern(char *pattern, size_t *it)
 {
-	if (haystack[*(ih)] != pattern[*(ip)])
-		return (IS_FALSE);
-	while (haystack[*(ih)] && pattern[*(ip)] && pattern[*(ip)] != '*')
+	while (it[1] > 0)
 	{
-		if (haystack[*(ih)] != pattern[*(ip)])
-			return (IS_FALSE);
-		*(ih) += 1;
-		*(ip) += 1;
+		if (pattern[it[1]] == '*')
+			break ;
+		it[1] -= 1;
 	}
+}
+
+static inline int	ft_regex_lit(char *haystack, char *pattern,
+		size_t *it, size_t *len_h_p)
+{
+	if (haystack[it[0]] != pattern[it[1]])
+		return (IS_FALSE);
+	while (haystack[it[0]] && pattern[it[1]] && pattern[it[1]] != '*')
+	{
+		if (haystack[it[0]] != pattern[it[1]])
+		{
+			if (it[1] < len_h_p[1] && it[0] < len_h_p[0])
+			{
+				ft_back_pattern(pattern, it);
+				return (IS_TRUE);
+			}
+			return (IS_FALSE);
+		}
+		it[0] += 1;
+		it[1] += 1;
+	}
+	if ((it[1] == len_h_p[1] && it[0] != len_h_p[0])
+		|| (len_h_p[0] - it[0] < len_h_p[1] - it[1]))
+		return (IS_FALSE);
 	return (IS_TRUE);
 }
 
@@ -69,7 +99,7 @@ int	ft_regex(char *haystack, char *pattern)
 		}
 		else
 		{
-			if (ft_regex_lit(haystack, pattern, &i_h_p[0], &i_h_p[1])
+			if (ft_regex_lit(haystack, pattern, &i_h_p[0], &len_h_p[0])
 				== IS_FALSE)
 				return (IS_FALSE);
 		}

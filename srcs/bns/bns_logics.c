@@ -15,13 +15,19 @@
 int	ft_operator(t_ms *mini)
 {
 	if (mini->first_token->type == OPR_OR && mini->exitstatus > 0)
-		return (ft_process_branch(mini));
-	if (mini->first_token->type == OPR_AND && mini->exitstatus == 0)
-		return (ft_process_branch(mini));
-	if (mini->first_token->next)
 	{
 		ft_process_branch(mini);
-		ft_process_branch(mini);
+		ft_do_workflow(mini);
+		return (SUCCESS);
 	}
+	if (mini->first_token->type == OPR_AND && mini->exitstatus == 0)
+	{
+		ft_process_branch(mini);
+		ft_do_workflow(mini);
+		return (SUCCESS);
+	}
+	ft_process_branch(mini);
+	while (mini->first_token && mini->first_token->meta < MTA_NEXT)
+		ft_process_branch(mini);
 	return (ERROR);
 }

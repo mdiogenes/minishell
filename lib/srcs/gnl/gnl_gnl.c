@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "libft.h"
+#include <stdio.h>
 
 char	*get_next_line(int fd)
 {	
@@ -28,10 +29,10 @@ char	*get_next_line(int fd)
 	if (nl_len[0] == 0)
 	{
 		reader = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		if (reader == NULL)
+		if (!reader)
 			return (NULL);
 		rst = ft_buffer_reader(fd, &buffer[fd], reader, &nl_len[0]);
-		free (reader);
+		ft_safe_free_char(&reader);
 	}
 	else
 		rst = ft_line_proccess(&buffer[fd], 0, &nl_len[0]);
@@ -91,11 +92,11 @@ char	*ft_delete_line_from_buffer(char **buffer, int *nl_len)
 
 	if (nl_len[0] == nl_len[1] || (nl_len[0] == 0 && nl_len[1] > 0))
 	{
-		free(*buffer);
+		ft_safe_free_char(buffer);
 		return (NULL);
 	}
 	rst = ft_substr_gnl(*buffer, nl_len[0], nl_len[1] - nl_len[0], &nl_len[0]);
-	free(*buffer);
+	ft_safe_free_char(buffer);
 	return (rst);
 }
 

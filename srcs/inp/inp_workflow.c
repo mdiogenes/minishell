@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/13 13:33:06 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/29 11:15:00 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/07/07 10:50:55 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ static inline void	ft_workflow_params(t_token *node)
 
 	if (node->next->meta > MTA_ARGS)
 		return ;
+	node->args = node->next;
+	if (node->args && node->args->sp_tkn >= 4)
+		node->args->sp_tkn -= 4;
 	args = node->next;
 	while (args)
 	{
@@ -42,6 +45,8 @@ static inline void	ft_workflow_rdr(t_token *node, t_token *prev)
 		{
 			prev->out = TKN_PIPEOUT;
 			node->in = TKN_PIPEIN;
+			if (node->type == RDR_TO_FILE && node->to_out != 0)
+				prev->to_out = node->to_out;
 		}
 		if (prev && prev->out == TKN_PIPEOUT)
 			node->in = TKN_PIPEIN;
@@ -49,18 +54,14 @@ static inline void	ft_workflow_rdr(t_token *node, t_token *prev)
 				|| node->next->type == RDR_APP_FILE))
 			node->out = TKN_PIPEOUT;
 	}
-	else if (node->type == IMP_FROM_FILE || node->type == IMP_HEREDOC)
+	else if ((node->type == IMP_FROM_FILE
+			|| node->type == IMP_HEREDOC) && node->next)
 		node->out = TKN_PIPEOUT;
 }
 
-static inline void	ft_workflow_redir(t_ms *mini)
+static inline void	ft_workflow_redir(t_ms *mini, t_token *node, t_token *prev)
 {
-	t_token	*node;
-	t_token	*prev;
-
-	node = mini->first_token;
-	prev = NULL;
-	while (node)
+	while (node && node->meta < MTA_NEXT)
 	{	
 		if (node->meta >= MTA_REDIR_FILE && node->meta <= MTA_REDIR)
 		{
@@ -69,7 +70,10 @@ static inline void	ft_workflow_redir(t_ms *mini)
 				if (prev)
 					prev->out = TKN_PIPEOUT;
 				if (node->next)
+				{
 					node->next->in = TKN_PIPEIN;
+					node->next->status = FIRST_PIPE;
+				}
 				node = ft_remove_node(node, prev, &mini->first_token);
 				continue ;
 			}
@@ -90,9 +94,11 @@ static inline void	ft_workflow_order(t_ms *mini)
 
 	node = mini->first_token;
 	prev = NULL;
-	while (node)
+	while (node && node->meta < MTA_NEXT)
 	{
-		if (node->next && (node->next->type == IMP_FROM_FILE
+		if (node->next && (node->type != IMP_FROM_FILE
+				&& node->type != IMP_HEREDOC)
+			&& (node->next->type == IMP_FROM_FILE
 				|| node->next->type == IMP_HEREDOC))
 		{
 			if (prev != NULL)
@@ -111,33 +117,28 @@ static inline void	ft_workflow_order(t_ms *mini)
 int	ft_workflow(t_ms *mini)
 {
 	t_token	*node;
+	t_token	*prev;
 
+	prev = NULL;
+	if (ft_syntax_check(mini) == ERROR)
+		return (ERROR);
 	if (ft_input_preprocess(mini) == ERROR)
 		return (ERROR);
-	ft_print_tree_debug("ft_workflow despues preproceso", mini->first_token);
-	ft_clean_quotes(mini);
-	ft_print_tree_debug("ft_workflow despues quotes", mini->first_token);
 	node = mini->first_token;
 	if (!node)
 		return (ERROR);
-	while (node)
+	while (node && node->meta < MTA_NEXT)
 	{
-		if (node->next && node->next->meta <= MTA_ARGS)
-		{
-			node->args = node->next;
+		if (node->next && ((node->next->meta <= MTA_ARGS
+					&& node->meta <= MTA_OUTEXE)
+				|| (node->meta == MTA_REDIR_FILE)))
 			ft_workflow_params(node);
-		}
 		node = node->next;
 	}
-	ft_print_tree_debug("ft_workflow; antesddeorder-while", mini->first_token);
+	ft_check_imp_file(mini);
 	ft_workflow_order(mini);
-	ft_print_tree_debug("ft_workflow; despues order", mini->first_token);
-	ft_check_input_export(mini);
-	ft_print_tree_debug("ft_workflow; despues input export", mini->first_token);
-	ft_workflow_redir(mini);
+	ft_workflow_redir(mini, mini->first_token, prev);
 	ft_inp_redir(mini);
-	ft_print_tree_debug("ft_workflow; despues redirs", mini->first_token);
-	ft_workflow_check(mini);
-	ft_print_tree_debug("ft_workflow; despues check", mini->first_token);
+	ft_check_branch(mini);
 	return (SUCCESS);
 }

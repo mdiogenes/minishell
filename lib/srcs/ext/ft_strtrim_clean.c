@@ -12,7 +12,7 @@
 
 #include "libft.h"
 
-static int	ft_trim_charset(char c, char const *charset)
+static inline int	ft_trim_charset(char c, char const *charset)
 {
 	int	i;
 
@@ -26,7 +26,8 @@ static int	ft_trim_charset(char c, char const *charset)
 	return (0);
 }
 
-static void	ft_trim_fromto(char const *s1, char const *set, size_t *fromto)
+static inline void	ft_trim_fromto(char const *s1,
+		char const *set, size_t *fromto)
 {
 	size_t	i;
 	size_t	len;
@@ -51,30 +52,36 @@ static void	ft_trim_fromto(char const *s1, char const *set, size_t *fromto)
 		fromto[2] = 0;
 }
 
-char	*ft_strtrim_clean(char *s1, char const *set)
+static inline void	ft_fill_str(char *s1, size_t *fromto, char **rst)
 {
 	size_t	i;
+
+	i = 0;
+	if (fromto[2] == 0)
+		return ;
+	while (i < fromto[2])
+	{
+		(*rst)[i] = s1[fromto[0]];
+		i++;
+		fromto[0]++;
+	}
+}
+
+char	*ft_strtrim_clean(char *s1, char const *set)
+{
 	size_t	fromto[3];
 	char	*rst;
 
 	if (!set)
-		return ((char *)s1);
+		return (s1);
 	if (!s1)
 		return (NULL);
-	i = 0;
 	ft_trim_fromto(s1, set, &fromto[0]);
 	rst = (char *)malloc(sizeof(char) * (fromto[2] + 1));
 	if (rst == NULL)
 		return (NULL);
 	rst[fromto[2]] = '\0';
-	if (fromto[2] == 0)
-		return (rst);
-	while (i < fromto[2])
-	{
-		rst[i] = s1[fromto[0]];
-		i++;
-		fromto[0]++;
-	}
-	free(s1);
+	ft_fill_str(s1, &fromto[0], &rst);
+	ft_safe_free_char(&s1);
 	return (rst);
 }

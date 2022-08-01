@@ -14,7 +14,8 @@
 
 int	ft_pwd(t_ms *mini)
 {
-	ft_putendl_fd(mini->path, STDOUT_FILENO);
+	ft_putstr_fd(mini->path, STDOUT_FILENO);
+	ft_putchar_fd('\n', STDOUT_FILENO);
 	ft_process_branch(mini);
 	mini->exitstatus = 0;
 	return (SUCCESS);

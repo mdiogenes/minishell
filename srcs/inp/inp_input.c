@@ -19,16 +19,22 @@ static inline int	ft_clear_spaces(char *line, int i)
 	return (i);
 }
 
-static inline char	*ft_strdup_input(char *src, size_t len, t_ms *mini)
+static inline char	*ft_strdup_input(char *src, size_t len,
+	size_t i, t_ms *mini)
 {
 	char	*dst;
 
-	dst = (char *)ft_calloc(sizeof(char), (len + 1));
+	if (i > 0 && ft_is_space(src[i - 1]) == IS_TRUE)
+		mini->sp_tkn = 1;
+	mini->sp_tkn = mini->sp_tkn << 2;
+	if (src[i + len] && ft_is_space(src[i + len]) == IS_TRUE)
+		mini->sp_tkn |= 1;
+	dst = (char *)malloc(sizeof(char) * (len + 1));
 	if (dst == NULL)
 		ft_error_free(errno, mini);
-	dst[len] = '\0';
+	dst[len] = 0;
 	while (len--)
-		dst[len] = src[len];
+		dst[len] = src[i + len];
 	return (dst);
 }
 
@@ -55,14 +61,25 @@ static inline size_t	ft_strlen_chars(const char *s, char c)
 	return (i);
 }
 
+int	ft_final_load(t_ms *mini)
+{
+	if (ft_workflow_check(mini) != SUCCESS)
+		return (ERROR);
+	if (ft_open_nodes(mini) != SUCCESS)
+		return (ERROR);
+	return (SUCCESS);
+}
+
 int	ft_load_input(t_ms *mini)
 {
 	size_t		i;
 	size_t		len;
 
-	i = -1;
+	i = 0;
 	mini->line = ft_strtrim_clean(mini->line, " \n\t");
-	while (mini->line[++i])
+	if (ft_strlen_max(mini->line, 1) == 0)
+		return (ERROR);
+	while (mini->line[i])
 	{
 		i = ft_clear_spaces(mini->line, i);
 		if (mini->line[i] == '\'' || mini->line[i] == '\"')
@@ -75,11 +92,9 @@ int	ft_load_input(t_ms *mini)
 		}
 		if (mini->line[i] == '(' || mini->line[i] == ')')
 			len = 1;
-		if (mini->line[i] == '=' && mini->line[i - 1])
-			ft_export_fix(&mini->line[i - 1], &len, &i);
-		ft_inp_append(&mini->first_token, ft_inp_new(
-				ft_strdup_input(&mini->line[i], len, mini), mini));
-		i = i + len - 1;
+		ft_new_token(mini, ft_inp_new(
+				ft_strdup_input(mini->line, len, i, mini), mini));
+		i = i + len;
 	}
-	return (SUCCESS);
+	return (ft_final_load(mini));
 }

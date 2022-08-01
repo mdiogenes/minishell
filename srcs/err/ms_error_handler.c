@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/09 21:31:17 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/29 10:09:37 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/06/30 10:33:17 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,33 +14,42 @@
 
 int	ft_syntax_error(t_ms *mini, char token, int rpt)
 {
-	ft_putstr_fd("ms-42 : syntax error near unexpected token `", STDERR_FILENO);
+	ft_putstr_fd("ms-42 : syntax error near unexpected token `", MS_STDERR);
 	if (token == '\n')
-		ft_putstr_fd("newline", STDERR_FILENO);
+		ft_putstr_fd("newline", MS_STDERR);
 	else
 	{
 		while (rpt--)
-			ft_putchar_fd(token, STDERR_FILENO);
+			ft_putchar_fd(token, MS_STDERR);
 	}
-	ft_putstr_fd("'\n", STDERR_FILENO);
+	ft_putstr_fd("'\n", MS_STDERR);
 	mini->exitstatus = 258;
+	return (ERROR);
+}
+
+int	ft_ambiguous_error(t_ms *mini, char *token)
+{
+	ft_putstr_fd("ms-42: ", MS_STDERR);
+	ft_putstr_fd(token, MS_STDERR);
+	ft_putstr_fd(": ambiguous redirect\n", MS_STDERR);
+	mini->exitstatus = 1;
 	return (ERROR);
 }
 
 int	ft_error_unset_var(char *msg, t_token *token, t_ms *mini)
 {
-	ft_putstr_fd("ms-42 ", STDERR_FILENO);
-	ft_putstr_fd("unset : `", STDERR_FILENO);
+	ft_putstr_fd("ms-42 ", MS_STDERR);
+	ft_putstr_fd("unset : `", MS_STDERR);
 	if (token->token)
-		ft_putstr_fd(token->token, STDERR_FILENO);
+		ft_putstr_fd(token->token, MS_STDERR);
 	if (token->args)
 	{
-		ft_putstr_fd("=", STDERR_FILENO);
-		ft_putstr_fd(token->args->token, STDERR_FILENO);
+		ft_putstr_fd("=", MS_STDERR);
+		ft_putstr_fd(token->args->token, MS_STDERR);
 	}
-	ft_putstr_fd("' ", STDERR_FILENO);
-	ft_putstr_fd(msg, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
+	ft_putstr_fd("' ", MS_STDERR);
+	ft_putstr_fd(msg, MS_STDERR);
+	ft_putstr_fd("\n", MS_STDERR);
 	mini->exitstatus = 1;
 	ft_process_branch(mini);
 	return (mini->exitstatus);
@@ -48,30 +57,20 @@ int	ft_error_unset_var(char *msg, t_token *token, t_ms *mini)
 
 int	ft_error_handler(int error, t_ms *mini)
 {
-	ft_putstr_fd("ms-42 Error:", STDERR_FILENO);
-	ft_putstr_fd(strerror(error), STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
-	ft_process_branch(mini);
+	if (error == 0)
+		return (ERROR);
+	ft_putstr_fd("ms-42 Error: ", MS_STDERR);
+	ft_putstr_fd(strerror(error), MS_STDERR);
+	ft_putstr_fd("\n", MS_STDERR);
 	mini->exitstatus = 1;
 	return (ERROR);
 }
 
-int	ft_error_free(int error, t_ms *mini)
-{
-	ft_putstr_fd("ms-42 Error:", STDERR_FILENO);
-	ft_putstr_fd(strerror(error), STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
-	ft_free_exit(mini);
-	mini->exitstatus = 1;
-	exit (mini->exitstatus);
-	return (mini->exitstatus);
-}
-
 void	ft_error_general(char *msg, t_ms *mini)
 {
-	ft_putstr_fd("ms-42 Error:", STDERR_FILENO);
-	ft_putstr_fd(msg, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
+	ft_putstr_fd("ms-42 Error:", MS_STDERR);
+	ft_putstr_fd(msg, MS_STDERR);
+	ft_putstr_fd("\n", MS_STDERR);
 	ft_free_exit(mini);
 	mini->exitstatus = 1;
 	exit (mini->exitstatus);

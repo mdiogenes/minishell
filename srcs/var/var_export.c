@@ -12,41 +12,37 @@
 
 #include "minishell.h"
 
-static inline t_token	*ft_new_env(char *token, t_ms *mini)
-{
-	t_token	*rst;
-
-	rst = (t_token *)malloc(sizeof(t_token));
-	if (rst == NULL)
-		ft_error_free(errno, mini);
-	rst->token = token;
-	rst->type = 0;
-	rst->meta = 0;
-	rst->in = 0;
-	rst->out = 0;
-	rst->next = NULL;
-	rst->args = NULL;
-	return (rst);
-}
-
 t_token	*ft_find_envar_export(char *needle, t_ms *mini)
 {
 	t_token	*node;
-	size_t	len;
 
 	node = mini->env;
 	while (node)
 	{
-		len = ft_strlen(node->token);
-		if (len == ft_strlen(needle)
-			&& ft_strncmp(node->token, needle, len) == 0)
+		if (ft_strict_cmp(node->token, needle) == 0)
 			return (node);
 		node = node->next;
 	}
 	return (NULL);
 }
 
-void	ft_export_var(char *var, char *val, t_ms *mini)
+static inline void	ft_join_to_var(t_token *dst, char *val,
+		unsigned char sts, t_ms *mini)
+{
+	if (val == NULL)
+		return ;
+	if (!dst->args)
+		dst->args = ft_inp_new(ft_strdup(val), mini);
+	else if (dst->args && sts == 0)
+	{
+		ft_delete_node(dst->args);
+		dst->args = ft_inp_new(ft_strdup(val), mini);
+	}
+	else if (dst->args && sts == 1)
+		dst->args->token = ft_strjoin_clean(&dst->args->token, &val, 1);
+}
+
+void	ft_export_var(char *var, char *val, unsigned char sts, t_ms *mini)
 {
 	t_token	*new;
 	t_token	*dst;
@@ -54,18 +50,13 @@ void	ft_export_var(char *var, char *val, t_ms *mini)
 	dst = ft_find_envar_export(var, mini);
 	if (dst == NULL)
 	{
-		new = ft_new_env(ft_strdup(var), mini);
+		new = ft_inp_new(ft_strdup(var), mini);
 		if (val != NULL)
-			new->args = ft_new_env(ft_strdup(val), mini);
+			new->args = ft_inp_new(ft_strdup(val), mini);
 		ft_env_sort(&mini->env, new);
 	}
 	else
-	{
-		if (val == NULL)
-			return ;
-		ft_delete_node(dst->args);
-		dst->args = ft_new_env(ft_strdup(val), mini);
-	}
+		ft_join_to_var(dst, val, sts, mini);
 	if (ft_strict_cmp(var, "PATH") == 0)
 	{
 		ft_clear_tabs(mini->bin_paths);
@@ -83,18 +74,20 @@ int	ft_env_to_list(char **env, t_ms *mini)
 	while (env[i])
 	{
 		if (ft_strrchr(env[i], '=') == NULL)
-			new = ft_new_env(ft_strdup(env[i]), mini);
+			new = ft_inp_new(ft_strdup(env[i]), mini);
 		else
 		{
 			var = ft_split(env[i], '=');
-			new = ft_new_env(var[0], mini);
+			new = ft_inp_new(ft_strdup(var[0]), mini);
 			new->type = SYS_VAR;
 			if (ft_strict_cmp(new->token, "OLDPWD") != 0)
-				new->args = ft_new_env(var[1], mini);
-			free (var);
+				new->args = ft_inp_new(ft_strdup(var[1]), mini);
+			ft_clear_tabs(var);
 		}
 		ft_env_sort(&mini->env, new);
 		i++;
 	}
+	ft_shlvl_check(mini);
+	ft_export_var("OLDPWD", NULL, 0, mini);
 	return (SUCCESS);
 }

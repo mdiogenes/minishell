@@ -61,7 +61,18 @@ void	ft_inp_append(t_token **lst, t_token *new)
 		while (node->next != NULL)
 			node = node->next;
 		node->next = new;
+		new->prev = node;
 	}
+}
+
+void	ft_new_token(t_ms *mini, t_token *new)
+{
+	ft_inp_append(&mini->first_token, new);
+	new->sp_tkn = mini->sp_tkn;
+	new->special_tkn = mini->status_tkn;
+	mini->status_tkn = 0;
+	mini->sp_tkn = 0;
+	mini->last_token = new;
 }
 
 t_token	*ft_inp_new(char *cmd, t_ms *mini)
@@ -74,12 +85,20 @@ t_token	*ft_inp_new(char *cmd, t_ms *mini)
 	if (rst == NULL)
 		ft_error_free(errno, mini);
 	rst->token = cmd;
+	rst->stored = NULL;
 	rst->type = ft_read_from_node(cmd);
 	rst->meta = ft_get_meta_type(rst->type);
 	rst->in = TKN_STDIN;
 	rst->out = TKN_STDOUT;
 	rst->status = FROM_PARSE;
+	rst->exp_sts = 0;
 	rst->next = NULL;
+	rst->prev = NULL;
 	rst->args = NULL;
+	rst->sp_tkn = 0;
+	rst->special_tkn = 0;
+	rst->to_out = 0;
+	rst->null_tkn = 0;
+	rst->tkn_from = 0;
 	return (rst);
 }

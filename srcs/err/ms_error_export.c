@@ -12,58 +12,55 @@
 
 #include "minishell.h"
 
-int	ft_export_id_error(t_ms *mini, char *token)
+int	ft_export_opt_error(t_ms *mini, t_token *node)
 {
-	ft_putstr_fd("ms-42 : export `", STDERR_FILENO);
-	ft_putstr_fd(token, STDERR_FILENO);
-	ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
-	mini->exitstatus = 1;
+	ft_putchar_fd(node->token[0], MS_STDERR);
+	if (ft_strlen_max(node->token, 2) == 2)
+		ft_putchar_fd(node->token[1], MS_STDERR);
+	else
+	{
+		if (node->args != NULL)
+			ft_putchar_fd('=', MS_STDERR);
+	}
+	ft_putstr_fd("': invalid option\n", MS_STDERR);
+	mini->exitstatus = 2;
 	return (ERROR);
 }
 
-int	ft_error_export(t_token *token, t_ms *mini)
+int	ft_export_id_error(t_ms *mini, t_token *node)
 {
-	if (token->type == CMD_ASSIGN)
-		return (SUCCESS);
-	ft_putstr_fd("ms-42 ", STDERR_FILENO);
-	ft_putstr_fd("export : `", STDERR_FILENO);
-	if (token->type == CMD_ASSIGN_RE)
+	if (ft_strlen_max(node->token, 1) == 0)
+		return (ERROR);
+	ft_putstr_fd("ms-42 : export `", MS_STDERR);
+	if (node->meta != MTA_NULL_TOKEN && node->token[0] == '-')
+		return (ft_export_opt_error(mini, node));
+	if (node->args)
 	{
-		if (token->next)
-			ft_putstr_fd(token->next->token, STDERR_FILENO);
+		ft_putstr_fd(node->token, MS_STDERR);
+		ft_putstr_fd("=", MS_STDERR);
+		ft_putstr_fd(node->args->token, MS_STDERR);
 	}
-	if (token->type == CMD_ASSIGN_LE || token->type == CMD_ASSIGN_BE)
-	{
-		ft_putstr_fd(token->token, STDERR_FILENO);
-		if (token->next && token->type == CMD_ASSIGN_LE)
-			ft_putstr_fd(token->next->token, STDERR_FILENO);
-	}
-	ft_putstr_fd("' ", STDERR_FILENO);
-	ft_putstr_fd(MSG_ERR_IDNT, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
-	if (token->type == CMD_ASSIGN_BE)
-	{
-		token->type = CMD_ASSIGN_RE;
-		return (ft_error_export(token, mini));
-	}
+	else
+		ft_putstr_fd(node->token, MS_STDERR);
+	ft_putstr_fd("': not a valid identifier\n", MS_STDERR);
 	mini->exitstatus = 1;
 	return (ERROR);
 }
 
 int	ft_error_export_var(t_token *token, t_ms *mini)
 {
-	ft_putstr_fd("ms-42 ", STDERR_FILENO);
-	ft_putstr_fd("export : `", STDERR_FILENO);
+	ft_putstr_fd("ms-42 ", MS_STDERR);
+	ft_putstr_fd("export : `", MS_STDERR);
 	if (token->token)
-		ft_putstr_fd(token->token, STDERR_FILENO);
+		ft_putstr_fd(token->token, MS_STDERR);
 	if (token->args)
 	{
-		ft_putstr_fd("=", STDERR_FILENO);
-		ft_putstr_fd(token->args->token, STDERR_FILENO);
+		ft_putstr_fd("=", MS_STDERR);
+		ft_putstr_fd(token->args->token, MS_STDERR);
 	}
-	ft_putstr_fd("' ", STDERR_FILENO);
-	ft_putstr_fd(MSG_ERR_IDNT, STDERR_FILENO);
-	ft_putstr_fd("\n", STDERR_FILENO);
+	ft_putstr_fd("' ", MS_STDERR);
+	ft_putstr_fd(MSG_ERR_IDNT, MS_STDERR);
+	ft_putstr_fd("\n", MS_STDERR);
 	mini->exitstatus = 1;
 	return (ERROR);
 }

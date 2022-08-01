@@ -47,19 +47,18 @@ SRCS		=	ft/ft_atoi.c \
 				ft/ft_memmove.c \
 				gnl/gnl_gnl.c \
 				gnl/gnl_utl.c \
-				ext/ft_clear_tab.c \
-				ext/ft_count_char.c \
-				ext/ft_init_vector.c \
-				ext/ft_strict_cmp.c \
+				ext/ft_char_replace.c \
+				ext/ft_char_utl.c \
+				ext/ft_general_utl.c \
+				ext/ft_remove_lit.c \
+				ext/ft_strcmp.c \
 				ext/ft_strjoin_char.c \
 				ext/ft_strjoin_clean.c \
-				ext/ft_strnstr_len.c \
-				ext/ft_strlenchar.c \
-				ext/ft_strncmp_fnc.c \
-				ext/ft_strnjoin.c \
-				ext/ft_strnstr_end.c \
 				ext/ft_strndup.c \
+				ext/ft_strnjoin.c \
+				ext/ft_strstr.c \
 				ext/ft_strtrim_clean.c \
+				ext/ft_tab_utl.c \
 				lst/ft_lstadd_back.c \
 				lst/ft_lstadd_front.c \
 				lst/ft_lstclear.c \
@@ -83,16 +82,16 @@ NAME		=	libft.a
 HEADER		=	inc/libft.h
 OBJS_DIR	=	obj
 
-all: $(OBJS_SUBS) $(NAME) $(HEADER)
+all: $(NAME) $(HEADER)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS_SUBS) $(OBJS)
 	ar rcs $(NAME) $(OBJS)
 
-$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.c $(HEADER)
 	$(CC) -Iinc $(CFLAGS) -c $< -o $@
 
 $(OBJS_SUBS):
-	-mkdir $(OBJS_SUBS)
+	-@mkdir $(OBJS_SUBS)
 
 clean:
 	$(RM) $(OBJS)

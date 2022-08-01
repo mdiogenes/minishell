@@ -24,25 +24,37 @@ typedef struct s_list
 # define BUFFER_SIZE 1024
 
 //Extended
-char	*ft_strndup(const char *src, size_t len);
+void	ft_char_replace(char **s, char org, char new);
 size_t	ft_strlenchar(const char *s, char c);
 int		ft_strict_lenchar(const char *s, char c);
-size_t	ft_strnstr_len(const char *haystack, const char *needle, size_t len);
-char	*ft_strnstr_end(const char *haystack, const char *needle, size_t loc);
+size_t	ft_strlen_max(const char *s, size_t max);
+size_t	ft_count_char(const char *s, char c);
+char	ft_last_char(char *s);
+void	ft_init_vector(int *vector, int value, int size);
+void	ft_safe_free_char(char **s);
+int		ft_check_by_fnc(char *s, int (f)(int));
+char	*ft_remove_lit(char *s, char c);
+int		ft_strcmp(char *s1, char *s2);
+int		ft_strict_n_cmp(char *s1, char *s2, size_t l1, size_t l2);
+int		ft_strict_cmp(char *s1, char *s2);
+int		ft_strncmp_fnc(char *s1, char *s2, size_t n, int (*str_to)(int));
+char	*ft_strjoin_char(char const *s1, char const *s2, char sep);
+char	*ft_strjoin_clean_char(char **s1, char **s2, char sep, int clean);
+char	*ft_strjoin_clean(char **s1, char **s2, int clean);
+char	*ft_strjoin_clean_one(char **s1, char *s2);
+char	*ft_strjoin_clean_two(char *s1, char **s2);
+char	*ft_strjoin_clear_ptn(char *s1, char *s2, int clean);
+char	*ft_strndup(const char *src, size_t len);
 char	*ft_strnjoin(char const *s1, char const *s2,
 			size_t len_s1, size_t len_s2);
 char	*ft_strnjoin_clean(char *s1, char *s2,
 			size_t len_s1, size_t len_s2);
-char	*ft_strjoin_clean(char *s1, char *s2, int clean);
-char	*ft_strjoin_char(char const *s1, char const *s2, char sep);
-char	*ft_strjoin_clean_char(char *s1, char *s2, char sep, int clean);
-void	ft_clear_tabs(char **tab);
-int		ft_strict_n_cmp(char *s1, char *s2, size_t l1, size_t l2);
-int		ft_strict_cmp(char *s1, char *s2);
-size_t	ft_count_char(const char *s, char c);
-int		ft_strncmp_fnc(char *s1, char *s2, size_t n, int (*str_to)(int));
-void	ft_init_vector(int *vector, int value, int size);
+char	*ft_strnstr_end(const char *haystack, const char *needle, size_t loc);
+size_t	ft_strnstr_len(const char *haystack, const char *needle, size_t len);
 char	*ft_strtrim_clean(char *s1, char const *set);
+void	ft_clear_tabs(char **tab);
+size_t	ft_count_tab(char **s);
+void	ft_sort_str_tab(char **tab);
 //gnl
 char	*get_next_line(int fd);
 int		ft_strlen_gnl(char *s);

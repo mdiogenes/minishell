@@ -30,11 +30,12 @@ int	ft_inp_from_file(t_ms *mini)
 	int		fd_file;
 
 	fd_file = open(mini->first_token->args->token, O_RDONLY, S_IRWXU);
-	if (fd_file < 0 || errno > 0)
-		return (ft_error_handler(errno, mini));
-	ft_get_data(fd_file, STDOUT_FILENO);
+	if (fd_file < 0)
+		return (ft_redir_error(errno, mini->first_token->args->token, mini));
+	if (mini->first_token->out == TKN_PIPEOUT)
+		ft_get_data(fd_file, STDOUT_FILENO);
 	close(fd_file);
-	return (mini->exitstatus);
+	return (SUCCESS);
 }
 
 int	ft_dup_file(t_ms *mini)
@@ -50,7 +51,9 @@ int	ft_dup_file(t_ms *mini)
 				O_CREAT | O_WRONLY | O_APPEND, S_IRWXU);
 	if (fd_file < 0)
 		return (ft_error_handler(errno, mini));
-	if (mini->first_token->out == TKN_STDOUT)
+	if (mini->first_token->out == TKN_STDOUT
+		|| (mini->first_token->next
+			&& mini->first_token->next->meta != MTA_REDIR_FILE))
 		fd = fd_file;
 	else
 	{
@@ -60,40 +63,5 @@ int	ft_dup_file(t_ms *mini)
 	if (mini->first_token->in != TKN_STDIN)
 		ft_get_data(STDIN_FILENO, fd);
 	close (fd);
-	return (mini->exitstatus);
-}
-
-void	free_strings(char *rst, char *line)
-{
-	if (rst)
-		free (rst);
-	if (line)
-		free (line);
-}	
-
-int	ft_heredoc(t_ms *mini)
-{
-	char	*line;
-	char	*lim;
-	char	*rst;
-	size_t	len_lim;
-
-	lim = mini->first_token->args->token;
-	len_lim = ft_strlen(lim);
-	rst = NULL;
-	printf ("%zu %s \n", len_lim, lim);
-	while (1)
-	{
-		write(STDIN_FILENO, "\e[32mms-42_heredoc>\e[0m ", 24);
-		line = get_next_line(STDIN_FILENO);
-		if (!line)
-			break ;
-		if (ft_strlen(line) == (len_lim + 1)
-			&& ft_strncmp(line, lim, len_lim) == 0)
-			break ;
-		rst = ft_strjoin_clean(rst, line, 0);
-	}
-	ft_putstr_fd(rst, STDOUT_FILENO);
-	free_strings(rst, line);
 	return (SUCCESS);
 }

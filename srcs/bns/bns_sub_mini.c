@@ -14,9 +14,23 @@
 
 void	ft_sub_mini(t_ms *mini)
 {
+	int		keys_count;
+
+	keys_count = 1;
 	ft_process_branch(mini);
-	while (mini->first_token && mini->first_token->type != OPR_CLOSE_K)
+	ft_do_workflow(mini);
+	while (mini->first_token)
+	{
+		if (mini->first_token->type == OPR_OPEN_K)
+			keys_count++;
+		if (mini->first_token->type == OPR_CLOSE_K)
+		{
+			keys_count--;
+			if (keys_count == 0)
+				break ;
+		}
 		ft_token_dir(mini);
+	}
 	if (mini->first_token->type == OPR_CLOSE_K)
 		ft_process_branch(mini);
 	exit(mini->exitstatus);
@@ -29,6 +43,9 @@ int	ft_keys_process(t_ms *mini)
 	while (mini->first_token && mini->first_token->type != OPR_CLOSE_K)
 		ft_process_branch(mini);
 	if (mini->first_token->type == OPR_CLOSE_K)
+	{
 		ft_process_branch(mini);
+		ft_do_workflow(mini);
+	}
 	return (SUCCESS);
 }

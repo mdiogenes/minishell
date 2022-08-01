@@ -67,7 +67,7 @@ char	*ft_strjoin_gnl(char *s1, char *s2, int bytes, int *nl_len)
 	rst[nl_len[1]] = '\0';
 	ft_memcpy_gnl(rst, s1, nl_len[1] - bytes);
 	ft_memcpy_gnl(&rst[nl_len[1] - bytes], s2, bytes);
-	free(s1);
+	ft_safe_free_char(&s1);
 	return (rst);
 }
 

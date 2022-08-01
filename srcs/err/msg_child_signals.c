@@ -6,7 +6,7 @@
 /*   By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/26 11:31:02 by mporras-          #+#    #+#             */
-/*   Updated: 2022/06/29 11:13:45 by msoler-e         ###   ########.fr       */
+/*   Updated: 2022/07/07 14:19:30 by msoler-e         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,24 @@
 
 void	ft_child_signals_msg(int signum)
 {
-	static char		*msg[] = {"", "", "", "", "", "", "",
-		"", "", "", "", "Segmentation fault", "", "", "", "", ""};
+	static char		*msg[] = {"", "SIGINT", "SIGNAL2",
+		"SIGFPE", "", "", "Bus error", "Segmentation fault",
+		"SIGPIPE", "SIGALARM", "", "SIGUSR1", "SIGUSR2"};
 	char			*sign;
 
+	g_mini->exitstatus = signum | 128;
+	if (signum == 1)
+	{
+		g_mini->exitstatus = 1;
+		return ;
+	}
+	else if (signum == 2)
+		return ;
 	sign = ft_itoa(signum);
-	ft_putstr_fd("[ms-42 ", STDERR_FILENO);
-	ft_putstr_fd(msg[signum], STDERR_FILENO);
-	ft_putstr_fd(" : ", STDERR_FILENO);
-	ft_putstr_fd(sign, STDERR_FILENO);
-	ft_putstr_fd("]\n", STDERR_FILENO);
-	if (sign)
-		free(sign);
+	ft_putstr_fd("[ms-42 ", MS_STDERR);
+	ft_putstr_fd(msg[signum], MS_STDERR);
+	ft_putstr_fd(" : ", MS_STDERR);
+	ft_putstr_fd(sign, MS_STDERR);
+	ft_putstr_fd("]\n", MS_STDERR);
+	ft_safe_free_char(&sign);
 }

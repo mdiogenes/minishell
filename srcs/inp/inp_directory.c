@@ -12,12 +12,11 @@
 
 #include "minishell.h"
 
-char	*ft_directory(int i)
+static inline char	*ft_directory(int i)
 {
 	static char	*command[] = {"'", "\"", "$", "pwd", "cd",
 		"echo", "export", "unset", "env",
-		"exit", "./", "=", " =", " = ",
-		"= ", "|", ">", ">>", "<",
+		"exit", "./", "|", ">", ">>", "<",
 		"<<", ";", "||", "&&", "(", ")"};
 
 	return (command[i]);
@@ -40,9 +39,9 @@ int	ft_read_from_node(char *token)
 		if (len > 2 && (i + 1) == CMD_EXE
 			&& ft_strncmp_fnc(token, ft_directory(i), sizes, ft_tolower) == 0)
 			return (i + 1);
-		if (token[0] == '\'' && token[len - 1] == '\'')
+		if (token[0] == '\'')
 			return (CMD_LITERAL);
-		if (token[0] == '\"' && token[len - 1] == 34)
+		if (token[0] == '\"')
 			return (CMD_EXPAND);
 		if (token[0] == '$')
 			return (CMD_ENV_VAR);
@@ -59,10 +58,6 @@ int	ft_get_meta_type(int type)
 		return (MTA_BUILDIN);
 	if (type > CMD_EXIT && type <= CMD_EXE)
 		return (MTA_OUTEXE);
-	if (type >= CMD_ASSIGN && type <= CMD_ASSIGN_LE)
-		return (MTA_ASSIGN);
-	if (type >= CMD_ASSIGN_BE && type <= CMD_ASSIGN_RE)
-		return (MTA_ASSIGN_EMPTY);
 	if (type == RDR_PIPE)
 		return (MTA_REDIR);
 	if (type >= RDR_TO_FILE && type <= IMP_HEREDOC)

@@ -6,53 +6,63 @@
 #    By: mporras- <manon42bcn@yahoo.com>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/05/05 22:26:19 by mporras-          #+#    #+#              #
-#    Updated: 2022/06/29 11:41:07 by msoler-e         ###   ########.fr        #
+#    Updated: 2022/08/01 11:50:49 by mporras-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS_FILES		=	aaa_debug.c \
+SRCS_FILES		=	bns/bns_expand_chars.c \
 					bns/bns_logics.c \
 					bns/bns_regex.c \
 					bns/bns_sub_mini.c \
+					bns/bns_utils.c \
 					bns/bns_wildcard.c \
 					cmd/cmd_cd.c \
 					cmd/cmd_echo.c \
 					cmd/cmd_env.c \
 					cmd/cmd_exit.c \
 					cmd/cmd_export.c \
+					cmd/cmd_heredoc.c \
+					cmd/cmd_next.c \
 					cmd/cmd_pwd.c \
 					cmd/cmd_redirs.c \
 					cmd/cmd_unset.c \
 					err/ms_error_handler.c \
 					err/ms_error_export.c \
 					err/ms_error_comands.c \
+					err/ms_error_rare.c \
 					err/msg_child_signals.c \
+					inp/inp_bns_open_nodes.c \
+					inp/inp_checker.c \
+					inp/inp_clean.c \
 					inp/inp_directory.c \
-					inp/inp_export.c \
 					inp/inp_input.c \
 					inp/inp_input_utl.c \
 					inp/inp_open_nodes.c \
 					inp/inp_parse.c \
 					inp/inp_preprocess.c \
 					inp/inp_redir.c \
+					inp/inp_syntax.c \
 					inp/inp_workflow.c \
 					inp/inp_workflow_check.c \
 					ms/ms_expand.c \
+					ms/ms_expand_utl.c \
+					ms/ms_getvar.c \
 					ms/ms_main.c \
 					ms/ms_process.c \
 					ms/ms_signals.c \
 					exe/exe_exec.c \
 					exe/exe_pipes.c \
-					exe/exe_sandbox.c \
 					utl/utl_args.c \
 					utl/utl_cleaning.c \
 					utl/utl_list.c \
+					utl/utl_shlvl.c \
 					utl/utl_strings.c \
 					utl/utl_struct_utils.c \
 					utl/utl_atoi_test.c \
 					utl/utl_getpid.c \
 					var/var_sort.c \
-					var/var_export.c
+					var/var_export.c \
+					var/var_utls.c
 SRCS_DIR		=	srcs
 OBJS_DIR		=	obj
 OBJS_SUBS		= 	obj \
@@ -68,7 +78,7 @@ SRCS 			=	$(addprefix $(SRCS_DIR)/,$(SRCS_FILES))
 OBJS			=	$(addprefix $(OBJS_DIR)/,$(SRCS_FILES:.c=.o))
 LIB_DIR			=	lib
 LIB 			=	libft.a
-LEAKS			=	valgrind --leak-check=full --track-fds=yes --trace-children=yes -s -q
+LEAKS			=	valgrind --quiet --leak-check=full --track-fds=yes --trace-children=yes -s -q
 CC				=	gcc
 RM				= 	rm -rf
 CFLAGS			=	-Wall -Wextra -Werror
